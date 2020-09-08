@@ -7,6 +7,15 @@ from django.contrib.auth.models import (
 )
 
 
+class Shop(models.Model):
+    """model for shop object"""
+
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class UserManager(BaseUserManager):
     def create_user(self, username, password, **extra_kwargs):
         """Creates and saves an user"""
@@ -34,7 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     """User model"""
 
     username = models.CharField(max_length=30, unique=True)
-    name = models.EmailField(max_length=255)
+    name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_owner = models.BooleanField(default=False)
@@ -42,7 +51,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_salesman = models.BooleanField(default=False)
     is_customer = models.BooleanField(default=False)
     is_vendor = models.BooleanField(default=False)
+    shop = models.ForeignKey(Shop, on_delete=None, null=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = "username"
+
+    def __str__(self):
+        return self.name
