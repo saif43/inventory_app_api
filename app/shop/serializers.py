@@ -5,9 +5,6 @@ from core import models
 class ShopSerializer(serializers.ModelSerializer):
     """Serializer for shop"""
 
-    # owner = serializers.PrimaryKeyRelatedField(
-    #     many=True, queryset=User.objects.filter(is_owner=True)
-    # )
     owner = serializers.PrimaryKeyRelatedField(
         queryset=models.User.objects.filter(is_owner=True)
     )
@@ -55,3 +52,28 @@ class VendorSerializer(serializers.ModelSerializer):
         model = models.Vendor
         fields = ("id", "name", "contact", "shop")
         read_only_fields = ("id", "shop")
+
+
+class CustomerTrasnscationSerializer(serializers.ModelSerializer):
+    """Serializer for customer product transaction"""
+
+    def __init__(self, *args, **kwargs):
+        """Filter customers by shop"""
+
+        super(CustomerTrasnscationSerializer, self).__init__(*args, **kwargs)
+        own_shop = models.Shop.objects.get(owner=self.context["request"].user)
+        self.fields["customer"].queryset = models.Customer.objects.filter(shop=own_shop)
+
+    class Meta:
+        model = models.CustomerTrasnscation
+        fields = ("id", "order_time", "shop", "customer")
+        read_only_fields = ("id", "shop")
+
+
+class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
+    """Serializer for ordered products"""
+
+    class Meta:
+        model = models.CustomerOrderedItems
+        fields = ("id", "order", "product", "quantity")
+        read_only_fields = ("id",)

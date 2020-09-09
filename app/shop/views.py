@@ -1,4 +1,12 @@
-from core.models import Shop, Warehouse, Product, Customer, Vendor
+from core.models import (
+    Shop,
+    Warehouse,
+    Product,
+    Customer,
+    Vendor,
+    CustomerTrasnscation,
+    CustomerOrderedItems,
+)
 from shop import serializers
 
 from rest_framework import viewsets
@@ -9,6 +17,7 @@ from shop.permissions import (
     ProductAccessPermission,
     CustomerAccessPermission,
     VendorAccessPermission,
+    CustomerTransactionPermission,
 )
 
 
@@ -71,3 +80,20 @@ class VendorViewSet(BaseShopAttr):
     queryset = Vendor.objects.all()
     serializer_class = serializers.VendorSerializer
     permission_classes = (VendorAccessPermission,)
+
+
+class CustomerTrasnscationViewSet(BaseShopAttr):
+    """Manage transaction of customer"""
+
+    queryset = CustomerTrasnscation.objects.all()
+    serializer_class = serializers.CustomerTrasnscationSerializer
+    permission_classes = (CustomerTransactionPermission,)
+
+
+class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
+    """Manage customer ordered items of a single order"""
+
+    queryset = CustomerOrderedItems.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.CustomerOrderedItemsSerializer
+    permission_classes = (CustomerTransactionPermission,)

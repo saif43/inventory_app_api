@@ -103,3 +103,22 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CustomerTrasnscation(models.Model):
+    """Model for the transaction with Customer"""
+
+    order_time = models.DateTimeField(auto_now_add=True)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.pk}-{self.shop}"
+
+
+class CustomerOrderedItems(models.Model):
+    """Model for keeping customer ordered items"""
+
+    order = models.ForeignKey(CustomerTrasnscation, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)

@@ -83,3 +83,19 @@ class VendorAccessPermission(permissions.BasePermission):
 
         except:
             return False
+
+
+class CustomerTransactionPermission(permissions.BasePermission):
+    """Allowing/Restricting user to access the transactions"""
+
+    def has_permission(self, request, obj):
+        try:
+            if request.user.is_owner:
+                return True
+
+            if (
+                request.user.is_manager or request.user.is_salesman
+            ) and request.method in ["POST", "GET", "PUT", "PATCH"]:
+                return True
+        except:
+            pass
