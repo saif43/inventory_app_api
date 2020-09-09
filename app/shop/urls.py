@@ -3,7 +3,11 @@ from shop import views
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register("", views.ShowViewSet)
+router.register("shop", views.ShopViewSet)
+router.register("warehouse", views.WarehouseViewSet)
+router.register("product", views.ProductViewSet)
+router.register("customer", views.CustomerViewSet)
+router.register("vendor", views.VendorViewSet)
 
 app_name = "shop"
 

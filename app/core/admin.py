@@ -22,8 +22,6 @@ class UserAdmin(BaseUserAdmin):
                     "is_owner",
                     "is_manager",
                     "is_salesman",
-                    "is_customer",
-                    "is_vendor",
                 )
             },
         ),
@@ -39,3 +37,7 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Shop)
+admin.site.register(models.Warehouse)
+admin.site.register(models.Product)
+admin.site.register(models.Customer)
+admin.site.register(models.Vendor)

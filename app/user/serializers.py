@@ -16,9 +16,6 @@ class UserSerializer(serializers.ModelSerializer):
             "is_owner",
             "is_manager",
             "is_salesman",
-            "is_customer",
-            "is_vendor",
-            "shop",
         )
 
         extra_kwargs = {
