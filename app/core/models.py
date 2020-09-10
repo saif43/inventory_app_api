@@ -111,14 +111,15 @@ class CustomerTrasnscation(models.Model):
     order_time = models.DateTimeField(auto_now_add=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    quantity = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.pk}-{self.shop}"
+        return f"Trans {self.pk}---{self.shop}"
 
 
 class CustomerOrderedItems(models.Model):
     """Model for keeping customer ordered items"""
 
-    order = models.ForeignKey(CustomerTrasnscation, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=0)
+    order = models.ManyToManyField(CustomerTrasnscation)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)

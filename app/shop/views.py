@@ -93,7 +93,15 @@ class CustomerTrasnscationViewSet(BaseShopAttr):
 class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
     """Manage customer ordered items of a single order"""
 
-    queryset = CustomerOrderedItems.objects.all()
     authentication_classes = (TokenAuthentication,)
+    queryset = CustomerOrderedItems.objects.all()
     serializer_class = serializers.CustomerOrderedItemsSerializer
     permission_classes = (CustomerTransactionPermission,)
+
+    def perform_create(self, serializer):
+        own_shop = Shop.objects.get(owner=self.request.user)
+        serializer.save(shop=own_shop)
+
+    def get_queryset(self):
+        own_shop = Shop.objects.get(owner=self.request.user)
+        return self.queryset.filter(shop=own_shop)

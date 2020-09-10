@@ -60,20 +60,40 @@ class CustomerTrasnscationSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         """Filter customers by shop"""
 
+        # many = kwargs.pop("many", True)
         super(CustomerTrasnscationSerializer, self).__init__(*args, **kwargs)
+
         own_shop = models.Shop.objects.get(owner=self.context["request"].user)
         self.fields["customer"].queryset = models.Customer.objects.filter(shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
 
     class Meta:
         model = models.CustomerTrasnscation
-        fields = ("id", "order_time", "shop", "customer")
+        fields = ("id", "order_time", "shop", "customer", "product", "quantity")
         read_only_fields = ("id", "shop")
 
 
 class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
     """Serializer for ordered products"""
 
+    # def __init__(self, *args, **kwargs):
+    #     """Filter customers by shop"""
+
+    #     # many = kwargs.pop("many", True)
+    #     super(CustomerOrderedItemsSerializer, self).__init__(*args, **kwargs)
+
+    #     own_shop = models.Shop.objects.get(owner=self.context["request"].user)
+    #     self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
+    #         shop=own_shop
+    #     )
+
+    #     print(len(self.fields["order"].queryset))
+
+    order = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=models.CustomerTrasnscation.objects.all()
+    )
+
     class Meta:
         model = models.CustomerOrderedItems
-        fields = ("id", "order", "product", "quantity")
-        read_only_fields = ("id",)
+        fields = ("id", "order", "shop")
+        read_only_fields = ("id", "shop")
