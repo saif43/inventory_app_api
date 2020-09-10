@@ -2,6 +2,11 @@ from rest_framework import serializers
 from core import models
 
 
+def getShop(user):
+    if user.is_owner:
+        return models.Shop.objects.get(owner=user)
+
+
 class ShopSerializer(serializers.ModelSerializer):
     """Serializer for shop"""
 
@@ -64,36 +69,51 @@ class CustomerTrasnscationSerializer(serializers.ModelSerializer):
         super(CustomerTrasnscationSerializer, self).__init__(*args, **kwargs)
 
         own_shop = models.Shop.objects.get(owner=self.context["request"].user)
-        self.fields["customer"].queryset = models.Customer.objects.filter(shop=own_shop)
-        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
+        self.fields["customer"].queryset = models.Customer.objects.filter(
+            shop=own_shop)
 
     class Meta:
         model = models.CustomerTrasnscation
-        fields = ("id", "order_time", "shop", "customer", "product", "quantity")
+        fields = ("id", "order_time", "shop",
+                  "customer")
         read_only_fields = ("id", "shop")
 
 
 class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
     """Serializer for ordered products"""
 
-    # def __init__(self, *args, **kwargs):
-    #     """Filter customers by shop"""
+    def validate(self, data):
+        product = data['product']
+        order = data['order']
 
-    #     # many = kwargs.pop("many", True)
-    #     super(CustomerOrderedItemsSerializer, self).__init__(*args, **kwargs)
+        if product is None:
+            raise serializers.ValidationError("No product has been selected.")
+        if order is None:
+            raise serializers.ValidationError("No order has been selected.")
 
-    #     own_shop = models.Shop.objects.get(owner=self.context["request"].user)
-    #     self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
-    #         shop=own_shop
-    #     )
+        exists = models.CustomerOrderedItems.objects.filter(
+            product=product, order=order)
 
-    #     print(len(self.fields["order"].queryset))
+        if exists:
+            raise serializers.ValidationError("Duplicate entires not allowed.")
 
-    order = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=models.CustomerTrasnscation.objects.all()
-    )
+        return data
+
+    def __init__(self, *args, **kwargs):
+        """Filter customers by shop"""
+
+        # many = kwargs.pop("many", True)
+        super(CustomerOrderedItemsSerializer, self).__init__(*args, **kwargs)
+
+        own_shop = models.Shop.objects.get(owner=self.context["request"].user)
+        self.fields["product"].queryset = models.Product.objects.filter(
+            shop=own_shop)
+        self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
+            shop=own_shop)
+
+    # product = ProductSerializer()
 
     class Meta:
         model = models.CustomerOrderedItems
-        fields = ("id", "order", "shop")
+        fields = ("id", "order", "shop", "product", "quantity")
         read_only_fields = ("id", "shop")
