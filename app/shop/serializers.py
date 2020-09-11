@@ -102,6 +102,14 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
         if exists:
             raise serializers.ValidationError("Duplicate entires not allowed.")
 
+        stock = product.stock - quantity
+
+        if stock < 0:
+            raise serializers.ValidationError("Insufficient stock.")
+
+        product.stock = stock
+        product.save()
+
         return data
 
     def __init__(self, *args, **kwargs):

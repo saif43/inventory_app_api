@@ -9,7 +9,7 @@ from core.models import (
 )
 from shop import serializers
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 
 from rest_framework.authentication import TokenAuthentication
@@ -100,6 +100,11 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CustomerOrderedItemsSerializer
     permission_classes = (CustomerTransactionPermission,)
 
+    filter_backends = (filters.SearchFilter,)
+    search_fields = (
+        "order__id",
+    )
+
     def perform_create(self, serializer):
         own_shop = Shop.objects.get(owner=self.request.user)
         serializer.save(shop=own_shop)
@@ -114,25 +119,27 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
 
         return self.serializer_class
 
-    def retrieve(self, request, *args, **kwargs):
+    # def retrieve(self, request, *args, **kwargs):
+    #     """overriding retrieve function, to get result of list of transaction filtered by order_id"""
 
-        # do your customization here
-        # instance = self.get_object()
-        # # instance = CustomerOrderedItems.objects.filter(order=self.kwargs[])
-        # print(instance.id)
-        try:
-            transaction = CustomerTrasnscation.objects.filter(pk=kwargs['pk'])
+    #     # do your customization here
+    #     # instance = self.get_object()
+    #     # # instance = CustomerOrderedItems.objects.filter(order=self.kwargs[])
+    #     # print(instance.id)
+    #     try:
+    #         # http://api/kwargs['pk']
+    #         transaction = CustomerTrasnscation.objects.filter(pk=kwargs['pk'])
 
-            instance = CustomerOrderedItems.objects.filter(
-                order=transaction[0])
+    #         instance = CustomerOrderedItems.objects.filter(
+    #             order=transaction[0])
 
-            serialized_data = []
+    #         serialized_data = []
 
-            for i in instance:
-                serialize = self.get_serializer(i)
-                serialized_data.append(serialize.data)
+    #         for i in instance:
+    #             serialize = self.get_serializer(i)
+    #             serialized_data.append(serialize.data)
 
-            return Response(serialized_data, status=status.HTTP_200_OK)
+    #         return Response(serialized_data, status=status.HTTP_200_OK)
 
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+    #     except:
+    #         return Response(status=status.HTTP_404_NOT_FOUND)
