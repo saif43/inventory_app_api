@@ -124,3 +124,5 @@ class CustomerOrderedItems(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.PositiveIntegerField(default=0)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
+    bill = models.PositiveIntegerField(default=0)
+

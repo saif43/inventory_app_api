@@ -9,7 +9,9 @@ from core.models import (
 )
 from shop import serializers
 
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+
 from rest_framework.authentication import TokenAuthentication
 from shop.permissions import (
     ShopAccessPermission,
@@ -105,3 +107,32 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         own_shop = Shop.objects.get(owner=self.request.user)
         return self.queryset.filter(shop=own_shop)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return serializers.CustomerTrasnscationProductDetailSerializer
+
+        return self.serializer_class
+
+    def retrieve(self, request, *args, **kwargs):
+
+        # do your customization here
+        # instance = self.get_object()
+        # # instance = CustomerOrderedItems.objects.filter(order=self.kwargs[])
+        # print(instance.id)
+        try:
+            transaction = CustomerTrasnscation.objects.filter(pk=kwargs['pk'])
+
+            instance = CustomerOrderedItems.objects.filter(
+                order=transaction[0])
+
+            serialized_data = []
+
+            for i in instance:
+                serialize = self.get_serializer(i)
+                serialized_data.append(serialize.data)
+
+            return Response(serialized_data, status=status.HTTP_200_OK)
+
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)

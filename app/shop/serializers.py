@@ -84,7 +84,9 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         product = data['product']
+        quantity = data['quantity']
         order = data['order']
+        # bill = data['bill']
 
         if product is None:
             raise serializers.ValidationError("No product has been selected.")
@@ -93,6 +95,9 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
 
         exists = models.CustomerOrderedItems.objects.filter(
             product=product, order=order)
+
+        # print(models.Product.objects.get(pk=product.id).price == product.price)
+        data['bill'] = product.price * quantity
 
         if exists:
             raise serializers.ValidationError("Duplicate entires not allowed.")
@@ -115,5 +120,9 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.CustomerOrderedItems
-        fields = ("id", "order", "shop", "product", "quantity")
-        read_only_fields = ("id", "shop")
+        fields = ("id", "order", "shop", "product", "quantity", "bill")
+        read_only_fields = ("id", "shop", "bill")
+
+
+class CustomerTrasnscationProductDetailSerializer(CustomerOrderedItemsSerializer):
+    product = ProductSerializer()
