@@ -134,3 +134,35 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
 
 class CustomerTrasnscationProductDetailSerializer(CustomerOrderedItemsSerializer):
     product = ProductSerializer()
+
+
+class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
+    """Serializer for Customer transaction bill"""
+
+    def __init__(self, *args, **kwargs):
+        """Filter customers by shop"""
+
+        # many = kwargs.pop("many", True)
+        super(CustomerTrasnscationBillSerializer,
+              self).__init__(*args, **kwargs)
+
+        own_shop = getShop(self.context["request"].user)
+        self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
+            shop=own_shop)
+
+    def validate(self, data):
+        order = data['order']
+        total_bill = 0
+
+        orders = models.CustomerOrderedItems.objects.filter(order=order)
+
+        for i in orders:
+            total_bill += i.bill
+
+        data['bill'] = total_bill
+        return data
+
+    class Meta:
+        model = models.CustomerTrasnscationBill
+        fields = ('id', 'shop', 'order', 'bill', 'paid')
+        read_only_fields = ('id', 'shop', 'bill')

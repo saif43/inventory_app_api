@@ -126,3 +126,11 @@ class CustomerOrderedItems(models.Model):
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
     bill = models.PositiveIntegerField(default=0)
 
+
+class CustomerTrasnscationBill(models.Model):
+    """Model for tracking the bill of a transaction"""
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
+    order = models.OneToOneField(CustomerTrasnscation,
+                                 on_delete=models.CASCADE,)
+    bill = models.PositiveIntegerField(default=0)
+    paid = models.PositiveIntegerField(default=0)

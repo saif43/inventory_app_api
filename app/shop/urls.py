@@ -9,7 +9,9 @@ router.register("product", views.ProductViewSet)
 router.register("customer", views.CustomerViewSet)
 router.register("vendor", views.VendorViewSet)
 router.register("customer_transactions", views.CustomerTrasnscationViewSet)
-router.register("customer_transactions_detail", views.CustomerOrderedItemsViewSet)
+router.register("customer_transactions_detail",
+                views.CustomerOrderedItemsViewSet)
+router.register("bill", views.CustomerTrasnscationBillViewSet)
 
 
 app_name = "shop"

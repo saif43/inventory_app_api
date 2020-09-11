@@ -6,6 +6,7 @@ from core.models import (
     Vendor,
     CustomerTrasnscation,
     CustomerOrderedItems,
+    CustomerTrasnscationBill
 )
 from shop import serializers
 
@@ -143,3 +144,10 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
 
     #     except:
     #         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class CustomerTrasnscationBillViewSet(BaseShopAttr):
+    """Manage bill of a transaction"""
+    queryset = CustomerTrasnscationBill.objects.all()
+    serializer_class = serializers.CustomerTrasnscationBillSerializer
+    permission_classes = (CustomerTransactionPermission,)
