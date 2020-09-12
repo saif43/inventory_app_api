@@ -6,7 +6,15 @@ class ShopAccessPermission(permissions.BasePermission):
 
     def has_permission(self, request, obj):
         try:
-            return request.user.is_superuser
+            if request.user.is_superuser:
+                return True
+
+            if request.user.is_owner and request.method in [
+                "GET",
+                "PUT",
+                "PATCH",
+            ]:
+                return True
         except:
             return False
 

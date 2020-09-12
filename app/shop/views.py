@@ -1,13 +1,4 @@
-from core.models import (
-    Shop,
-    Warehouse,
-    Product,
-    Customer,
-    Vendor,
-    CustomerTrasnscation,
-    CustomerOrderedItems,
-    CustomerTrasnscationBill
-)
+from core import models
 from shop import serializers
 
 from rest_framework import viewsets, status, filters
@@ -24,19 +15,31 @@ from shop.permissions import (
 )
 
 
+def getShop(user):
+    if user.is_owner:
+        return models.Shop.objects.get(owner=user)
+
+
 class ShopViewSet(viewsets.ModelViewSet):
     """Manage shops"""
 
-    queryset = Shop.objects.all()
+    queryset = models.Shop.objects.all()
     serializer_class = serializers.ShopSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (ShopAccessPermission,)
 
-    # def get_queryset(self):
-    #     if self.request.user.is_superuser:
-    #         return self.queryset
+    def get_queryset(self):
+        if not self.request.user.is_superuser:
+            own_shop = getShop(self.request.user)
+            return self.queryset.filter(pk=own_shop.id)
 
-    #     return self.queryset.filter(user__id=self.request.user.id)
+        return self.queryset
+
+    def get_serializer_class(self):
+        if self.request.user.is_superuser:
+            return serializers.AdminShopSerializer
+
+        return serializers.ShopSerializer
 
 
 class BaseShopAttr(viewsets.ModelViewSet):
@@ -45,18 +48,18 @@ class BaseShopAttr(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
-        own_shop = Shop.objects.get(owner=self.request.user)
+        own_shop = getShop(self.request.user)
         serializer.save(shop=own_shop)
 
     def get_queryset(self):
-        own_shop = Shop.objects.get(owner=self.request.user)
+        own_shop = getShop(self.request.user)
         return self.queryset.filter(shop=own_shop)
 
 
 class WarehouseViewSet(BaseShopAttr):
     """Manage warehouses"""
 
-    queryset = Warehouse.objects.all()
+    queryset = models.Warehouse.objects.all()
     serializer_class = serializers.WarehouseSerializer
     permission_classes = (WarehouseAccessPermission,)
 
@@ -64,7 +67,7 @@ class WarehouseViewSet(BaseShopAttr):
 class ProductViewSet(BaseShopAttr):
     """Manage products"""
 
-    queryset = Product.objects.all()
+    queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
     permission_classes = (ProductAccessPermission,)
 
@@ -72,7 +75,7 @@ class ProductViewSet(BaseShopAttr):
 class CustomerViewSet(BaseShopAttr):
     """Manage customer"""
 
-    queryset = Customer.objects.all()
+    queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomerSerializer
     permission_classes = (CustomerAccessPermission,)
 
@@ -80,7 +83,7 @@ class CustomerViewSet(BaseShopAttr):
 class VendorViewSet(BaseShopAttr):
     """Manage vendor"""
 
-    queryset = Vendor.objects.all()
+    queryset = models.Vendor.objects.all()
     serializer_class = serializers.VendorSerializer
     permission_classes = (VendorAccessPermission,)
 
@@ -88,7 +91,7 @@ class VendorViewSet(BaseShopAttr):
 class CustomerTrasnscationViewSet(BaseShopAttr):
     """Manage transaction of customer"""
 
-    queryset = CustomerTrasnscation.objects.all()
+    queryset = models.CustomerTrasnscation.objects.all()
     serializer_class = serializers.CustomerTrasnscationSerializer
     permission_classes = (CustomerTransactionPermission,)
 
@@ -97,25 +100,23 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
     """Manage customer ordered items of a single order"""
 
     authentication_classes = (TokenAuthentication,)
-    queryset = CustomerOrderedItems.objects.all()
+    queryset = models.CustomerOrderedItems.objects.all()
     serializer_class = serializers.CustomerOrderedItemsSerializer
     permission_classes = (CustomerTransactionPermission,)
 
     filter_backends = (filters.SearchFilter,)
-    search_fields = (
-        "order__id",
-    )
+    search_fields = ("order__id",)
 
     def perform_create(self, serializer):
-        own_shop = Shop.objects.get(owner=self.request.user)
+        own_shop = getShop(self.request.user)
         serializer.save(shop=own_shop)
 
     def get_queryset(self):
-        own_shop = Shop.objects.get(owner=self.request.user)
+        own_shop = getShop(self.request.user)
         return self.queryset.filter(shop=own_shop)
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == "list":
             return serializers.CustomerTrasnscationProductDetailSerializer
 
         return self.serializer_class
@@ -148,6 +149,49 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
 
 class CustomerTrasnscationBillViewSet(BaseShopAttr):
     """Manage bill of a transaction"""
-    queryset = CustomerTrasnscationBill.objects.all()
+
+    queryset = models.CustomerTrasnscationBill.objects.all()
     serializer_class = serializers.CustomerTrasnscationBillSerializer
+    permission_classes = (CustomerTransactionPermission,)
+
+
+class VendorTrasnscationViewSet(BaseShopAttr):
+    """Manage transaction of Vendor"""
+
+    queryset = models.VendorTrasnscation.objects.all()
+    serializer_class = serializers.VendorTrasnscationSerializer
+    permission_classes = (CustomerTransactionPermission,)
+
+
+class VendorOrderedItemsViewSet(viewsets.ModelViewSet):
+    """Manage Vendor ordered items of a single order"""
+
+    authentication_classes = (TokenAuthentication,)
+    queryset = models.VendorOrderedItems.objects.all()
+    serializer_class = serializers.VendorOrderedItemsSerializer
+    permission_classes = (CustomerTransactionPermission,)
+
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("order__id",)
+
+    def perform_create(self, serializer):
+        own_shop = getShop(self.request.user)
+        serializer.save(shop=own_shop)
+
+    def get_queryset(self):
+        own_shop = getShop(self.request.user)
+        return self.queryset.filter(shop=own_shop)
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return serializers.VendorTrasnscationProductDetailSerializer
+
+        return self.serializer_class
+
+
+class VendorTrasnscationBillViewSet(BaseShopAttr):
+    """Manage bill of a transaction"""
+
+    queryset = models.VendorTrasnscationBill.objects.all()
+    serializer_class = serializers.VendorTrasnscationBillSerializer
     permission_classes = (CustomerTransactionPermission,)
