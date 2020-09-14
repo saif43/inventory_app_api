@@ -5,6 +5,17 @@ from django.utils.translation import ugettext_lazy as _
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the User object"""
+    # created_by = serializers.SerializerMethodField('_user')
+
+    # # Use this method for the custom field
+    # def _user(self, obj):
+    #     request = self.context.get('request', None)
+    #     if request:
+    #         return request.user
+
+    def validate(self, data):
+        data['created_by'] = self.context["request"].user
+        return data
 
     class Meta:
         model = get_user_model()
@@ -16,6 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_owner",
             "is_manager",
             "is_salesman",
+            "created_by",
         )
 
         extra_kwargs = {
@@ -26,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
             }
         }
 
-        read_only_fields = ("id",)
+        read_only_fields = ("id", "created_by")
 
     def create(self, validated_data):
         """creates user with encrypted password and retruns the user"""

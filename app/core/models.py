@@ -41,6 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_owner = models.BooleanField(default=False)
     is_manager = models.BooleanField(default=False)
     is_salesman = models.BooleanField(default=False)
+    created_by = models.ForeignKey('self', on_delete=None, null=True)
 
     objects = UserManager()
 
@@ -59,6 +60,13 @@ class Shop(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Salesman(models.Model):
+    """model for salesman object"""
+
+    salesman = models.ManyToManyField(User)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
 
 
 class Warehouse(models.Model):
@@ -120,7 +128,8 @@ class CustomerTrasnscation(models.Model):
 class CustomerOrderedItems(models.Model):
     """Model for keeping customer ordered items"""
 
-    order = models.ForeignKey(CustomerTrasnscation, on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey(CustomerTrasnscation,
+                              on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.PositiveIntegerField(default=0)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
@@ -153,7 +162,8 @@ class VendorTrasnscation(models.Model):
 class VendorOrderedItems(models.Model):
     """Model for keeping vendor ordered items"""
 
-    order = models.ForeignKey(VendorTrasnscation, on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey(
+        VendorTrasnscation, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.PositiveIntegerField(default=0)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)

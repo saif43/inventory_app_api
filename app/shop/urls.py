@@ -9,7 +9,8 @@ router.register("product", views.ProductViewSet)
 router.register("customer", views.CustomerViewSet)
 router.register("vendor", views.VendorViewSet)
 router.register("customer_transactions", views.CustomerTrasnscationViewSet)
-router.register("customer_transactions_detail", views.CustomerOrderedItemsViewSet)
+router.register("customer_transactions_detail",
+                views.CustomerOrderedItemsViewSet)
 router.register("customer_bill", views.CustomerTrasnscationBillViewSet)
 router.register("vendor_transactions", views.VendorTrasnscationViewSet)
 router.register("vendor_transactions_detail", views.VendorOrderedItemsViewSet)
@@ -19,4 +20,5 @@ app_name = "shop"
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("salesman/", views.SalesmanViewSet.as_view(), name='salesman')
 ]

@@ -5,7 +5,7 @@ from rest_framework import status, viewsets, filters
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
-
+from django.db.models import Q
 
 from user.permissions import ProfileAccessPermission
 from user import serializers
@@ -16,6 +16,7 @@ class CreateUserAPIView(generics.CreateAPIView):
     """Creates a new user in the system"""
 
     serializer_class = serializers.UserSerializer
+    authentication_classes = (TokenAuthentication,)
 
 
 class UserListView(viewsets.ModelViewSet):
@@ -23,6 +24,20 @@ class UserListView(viewsets.ModelViewSet):
     serializer_class = serializers.UserSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (ProfileAccessPermission,)
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if self.request.user.is_superuser:
+            return queryset
+
+        if self.request.user.is_owner:
+            """if user is owner, then return self and manangers, salesmans created by him"""
+
+            queryset = queryset.filter(
+                Q(created_by=self.request.user) | Q(pk=self.request.user.id))
+
+            return queryset
 
 
 class CreateTokenView(ObtainAuthToken):

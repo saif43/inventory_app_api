@@ -3,6 +3,8 @@ from shop import serializers
 
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 
 from rest_framework.authentication import TokenAuthentication
 from shop.permissions import (
@@ -70,6 +72,16 @@ class ProductViewSet(BaseShopAttr):
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
     permission_classes = (ProductAccessPermission,)
+
+
+class SalesmanViewSet(APIView):
+    authentication_classes = (TokenAuthentication,)
+
+    def get(self, request, format=None):
+        queryset = models.User.objects.all()
+        queryset = queryset.filter(
+            created_by=self.request.user, is_salesman=True)
+        return Response(serializers.SalesmanSerializer(queryset, many=True).data)
 
 
 class CustomerViewSet(BaseShopAttr):
