@@ -216,9 +216,9 @@ class VendorTrasnscationBillViewSet(BaseShopAttr):
     permission_classes = (CustomerTransactionPermission,)
 
 
-class MoveShopToWarehouseViewset(BaseShopAttr):
+class MoveProductViewSet(BaseShopAttr):
     """Moving products shop to warehouse"""
 
-    queryset = models.MoveShopToWarehouse.objects.all()
-    serializer_class = serializers.MoveShopToWarehouseSerializer
+    queryset = models.MoveProduct.objects.all()
+    serializer_class = serializers.MoveProductSerializer
     permission_classes = (CustomerTransactionPermission,)

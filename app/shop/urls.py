@@ -15,7 +15,7 @@ router.register("customer_bill", views.CustomerTrasnscationBillViewSet)
 router.register("vendor_transactions", views.VendorTrasnscationViewSet)
 router.register("vendor_transactions_detail", views.VendorOrderedItemsViewSet)
 router.register("vendor_bill", views.VendorTrasnscationBillViewSet)
-router.register("move_product_from_shop_to_warehouse", views.MoveShopToWarehouseViewset)
+router.register("move_product", views.MoveProductViewSet)
 
 
 app_name = "shop"

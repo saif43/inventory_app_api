@@ -190,10 +190,16 @@ class VendorTrasnscationBill(models.Model):
     due = models.PositiveIntegerField(default=0)
 
 
-class MoveShopToWarehouse(models.Model):
+class MoveProduct(models.Model):
     """Model for moving product shop to warehouse"""
+
+    options = (
+        ("S2W", "Shop to Warehouse"),
+        ("W2S", "Warehouse to Shop"),
+    )
 
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     warehouse = models.ForeignKey(Warehouse, on_delete=None)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
+    move = models.CharField(max_length=3, choices=options, null=True)
