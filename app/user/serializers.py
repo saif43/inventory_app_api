@@ -5,16 +5,9 @@ from django.utils.translation import ugettext_lazy as _
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the User object"""
-    # created_by = serializers.SerializerMethodField('_user')
-
-    # # Use this method for the custom field
-    # def _user(self, obj):
-    #     request = self.context.get('request', None)
-    #     if request:
-    #         return request.user
 
     def validate(self, data):
-        data['created_by'] = self.context["request"].user
+        data["created_by"] = self.context["request"].user
         return data
 
     class Meta:

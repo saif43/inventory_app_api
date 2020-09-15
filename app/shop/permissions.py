@@ -1,19 +1,32 @@
 from rest_framework import permissions
+from core import models
+
+
+def getShop(user):
+    if user.is_owner:
+        return models.Shop.objects.get(owner=user)
 
 
 class ShopAccessPermission(permissions.BasePermission):
     """Allowing/Restricting user to update their profile"""
+
+    message = "You must have a shop to access this."
 
     def has_permission(self, request, obj):
         try:
             if request.user.is_superuser:
                 return True
 
-            if request.user.is_owner and request.method in [
-                "GET",
-                "PUT",
-                "PATCH",
-            ]:
+            if (
+                request.user.is_owner
+                and getShop(request.user)
+                and request.method
+                in [
+                    "GET",
+                    "PUT",
+                    "PATCH",
+                ]
+            ):
                 return True
         except:
             return False
@@ -22,15 +35,18 @@ class ShopAccessPermission(permissions.BasePermission):
 class WarehouseAccessPermission(permissions.BasePermission):
     """Allowing/Restricting user to access warehouse"""
 
+    message = "You must have a shop to access this."
+
     def has_permission(self, request, obj):
         try:
-            if request.user.is_owner:
-                return True
+            if getShop(request.user):
+                if request.user.is_owner:
+                    return True
 
-            if (
-                request.user.is_salesman or request.user.is_manager
-            ) and request.method in permissions.SAFE_METHODS:
-                return True
+                if (
+                    request.user.is_salesman or request.user.is_manager
+                ) and request.method in permissions.SAFE_METHODS:
+                    return True
 
         except:
             return False
@@ -39,21 +55,27 @@ class WarehouseAccessPermission(permissions.BasePermission):
 class ProductAccessPermission(permissions.BasePermission):
     """Allowing/Restricting user to access Product"""
 
+    message = "You must have a shop to access this."
+
     def has_permission(self, request, obj):
         try:
-            if request.user.is_owner:
-                return True
+            if getShop(request.user):
+                if request.user.is_owner:
+                    return True
 
-            if request.user.is_manager and request.method in [
-                "POST",
-                "GET",
-                "PUT",
-                "PATCH",
-            ]:
-                return True
+                if request.user.is_manager and request.method in [
+                    "POST",
+                    "GET",
+                    "PUT",
+                    "PATCH",
+                ]:
+                    return True
 
-            if request.user.is_salesman and request.method in permissions.SAFE_METHODS:
-                return True
+                if (
+                    request.user.is_salesman
+                    and request.method in permissions.SAFE_METHODS
+                ):
+                    return True
 
         except:
             return False
@@ -62,15 +84,18 @@ class ProductAccessPermission(permissions.BasePermission):
 class CustomerAccessPermission(permissions.BasePermission):
     """Allowing/Restricting user to access Customer"""
 
+    message = "You must have a shop to access this."
+
     def has_permission(self, request, obj):
         try:
-            if request.user.is_owner:
-                return True
+            if getShop(request.user):
+                if request.user.is_owner:
+                    return True
 
-            if (
-                request.user.is_salesman or request.user.is_manager
-            ) and request.method in permissions.SAFE_METHODS:
-                return True
+                if (
+                    request.user.is_salesman or request.user.is_manager
+                ) and request.method in permissions.SAFE_METHODS:
+                    return True
 
         except:
             return False
@@ -79,15 +104,18 @@ class CustomerAccessPermission(permissions.BasePermission):
 class VendorAccessPermission(permissions.BasePermission):
     """Allowing/Restricting user to access Customer"""
 
+    message = "You must have a shop to access this."
+
     def has_permission(self, request, obj):
         try:
-            if request.user.is_owner:
-                return True
+            if getShop(request.user):
+                if request.user.is_owner:
+                    return True
 
-            if (
-                request.user.is_salesman or request.user.is_manager
-            ) and request.method in permissions.SAFE_METHODS:
-                return True
+                if (
+                    request.user.is_salesman or request.user.is_manager
+                ) and request.method in permissions.SAFE_METHODS:
+                    return True
 
         except:
             return False
@@ -96,14 +124,17 @@ class VendorAccessPermission(permissions.BasePermission):
 class CustomerTransactionPermission(permissions.BasePermission):
     """Allowing/Restricting user to access the transactions"""
 
+    message = "You must have a shop to access this."
+
     def has_permission(self, request, obj):
         try:
-            if request.user.is_owner:
-                return True
+            if getShop(request.user):
+                if request.user.is_owner:
+                    return True
 
-            if (
-                request.user.is_manager or request.user.is_salesman
-            ) and request.method in ["POST", "GET", "PUT", "PATCH"]:
-                return True
+                if (
+                    request.user.is_manager or request.user.is_salesman
+                ) and request.method in ["POST", "GET", "PUT", "PATCH"]:
+                    return True
         except:
             pass

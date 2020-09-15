@@ -79,8 +79,7 @@ class SalesmanViewSet(APIView):
 
     def get(self, request, format=None):
         queryset = models.User.objects.all()
-        queryset = queryset.filter(
-            created_by=self.request.user, is_salesman=True)
+        queryset = queryset.filter(created_by=self.request.user, is_salesman=True)
         return Response(serializers.SalesmanSerializer(queryset, many=True).data)
 
 

@@ -23,8 +23,7 @@ class AdminShopSerializer(serializers.ModelSerializer):
         """Shows owner for superuser only"""
 
         super(AdminShopSerializer, self).__init__(*args, **kwargs)
-        self.fields["owner"].queryset = models.User.objects.filter(
-            is_owner=True)
+        self.fields["owner"].queryset = models.User.objects.filter(is_owner=True)
 
     class Meta:
         model = models.Shop
@@ -52,6 +51,7 @@ class WarehouseSerializer(serializers.ModelSerializer):
 
 class SalesmanSerializer(serializers.Serializer):
     """Serializer for salesman list"""
+
     id = serializers.IntegerField()
     username = serializers.CharField()
     mobile = serializers.CharField()
@@ -62,8 +62,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Product
-        fields = ("id", "name", "buying_price",
-                  "selling_price", "stock", "shop")
+        fields = ("id", "name", "buying_price", "selling_price", "stock", "shop")
         read_only_fields = ("id", "shop")
 
 
@@ -95,8 +94,7 @@ class CustomerTrasnscationSerializer(serializers.ModelSerializer):
         super(CustomerTrasnscationSerializer, self).__init__(*args, **kwargs)
 
         own_shop = models.Shop.objects.get(owner=self.context["request"].user)
-        self.fields["customer"].queryset = models.Customer.objects.filter(
-            shop=own_shop)
+        self.fields["customer"].queryset = models.Customer.objects.filter(shop=own_shop)
 
     class Meta:
         model = models.CustomerTrasnscation
@@ -145,8 +143,7 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
         super(CustomerOrderedItemsSerializer, self).__init__(*args, **kwargs)
 
         own_shop = models.Shop.objects.get(owner=self.context["request"].user)
-        self.fields["product"].queryset = models.Product.objects.filter(
-            shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
         self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
             shop=own_shop
         )
@@ -170,8 +167,7 @@ class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
         """Filter customers by shop"""
 
         # many = kwargs.pop("many", True)
-        super(CustomerTrasnscationBillSerializer,
-              self).__init__(*args, **kwargs)
+        super(CustomerTrasnscationBillSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
         self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
@@ -206,8 +202,7 @@ class VendorTrasnscationSerializer(serializers.ModelSerializer):
         super(VendorTrasnscationSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
-        self.fields["vendor"].queryset = models.Vendor.objects.filter(
-            shop=own_shop)
+        self.fields["vendor"].queryset = models.Vendor.objects.filter(shop=own_shop)
 
     class Meta:
         model = models.VendorTrasnscation
@@ -229,8 +224,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         if order is None:
             raise serializers.ValidationError("No order has been selected.")
 
-        exists = models.VendorOrderedItems.objects.filter(
-            product=product, order=order)
+        exists = models.VendorOrderedItems.objects.filter(product=product, order=order)
 
         # print(models.Product.objects.get(pk=product.id).price == product.price)
         data["bill"] = product.buying_price * quantity
@@ -252,8 +246,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         super(VendorOrderedItemsSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
-        self.fields["product"].queryset = models.Product.objects.filter(
-            shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
         self.fields["order"].queryset = models.VendorTrasnscation.objects.filter(
             shop=own_shop
         )

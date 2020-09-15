@@ -17,6 +17,7 @@ class CreateUserAPIView(generics.CreateAPIView):
 
     serializer_class = serializers.UserSerializer
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (ProfileAccessPermission,)
 
 
 class UserListView(viewsets.ModelViewSet):
@@ -35,7 +36,8 @@ class UserListView(viewsets.ModelViewSet):
             """if user is owner, then return self and manangers, salesmans created by him"""
 
             queryset = queryset.filter(
-                Q(created_by=self.request.user) | Q(pk=self.request.user.id))
+                Q(created_by=self.request.user) | Q(pk=self.request.user.id)
+            )
 
             return queryset
 
