@@ -66,6 +66,14 @@ class WarehouseViewSet(BaseShopAttr):
     permission_classes = (WarehouseAccessPermission,)
 
 
+class WarehouseProductsView(BaseShopAttr):
+    """Manage products in Warehouse"""
+
+    queryset = models.WareHouseProducts.objects.all()
+    serializer_class = serializers.WarehouseProductsSerializer
+    permission_classes = (WarehouseAccessPermission,)
+
+
 class ProductViewSet(BaseShopAttr):
     """Manage products"""
 

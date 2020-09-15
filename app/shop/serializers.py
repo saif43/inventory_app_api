@@ -36,6 +36,8 @@ class AdminShopSerializer(serializers.ModelSerializer):
         if not owner:
             raise serializers.ValidationError("No owner has been selected.")
 
+        return data
+
 
 class WarehouseSerializer(serializers.ModelSerializer):
     """Serializer for warehouse"""
@@ -46,6 +48,15 @@ class WarehouseSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Warehouse
         fields = ("id", "name", "shop")
+        read_only_fields = ("id", "shop")
+
+
+class WarehouseProductsSerializer(serializers.ModelSerializer):
+    """Serializer for warehouse products"""
+
+    class Meta:
+        model = models.WareHouseProducts
+        fields = ("id", "warehouse", "product", "quantity", "shop")
         read_only_fields = ("id", "shop")
 
 
@@ -217,20 +228,17 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         product = data["product"]
         quantity = data["quantity"]
         order = data["order"]
+        warehouse = data["delivery_warehouse"]
         # bill = data['bill']
 
         if product is None:
             raise serializers.ValidationError("No product has been selected.")
         if order is None:
             raise serializers.ValidationError("No order has been selected.")
+        if warehouse is None:
+            raise serializers.ValidationError("No warehouse has been selected.")
 
-        exists = models.VendorOrderedItems.objects.filter(product=product, order=order)
-
-        # print(models.Product.objects.get(pk=product.id).price == product.price)
         data["bill"] = product.buying_price * quantity
-
-        if exists:
-            raise serializers.ValidationError("Duplicate entires not allowed.")
 
         stock = product.stock + quantity
 
@@ -250,12 +258,23 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         self.fields["order"].queryset = models.VendorTrasnscation.objects.filter(
             shop=own_shop
         )
+        self.fields["delivery_warehouse"].queryset = models.Warehouse.objects.filter(
+            shop=own_shop
+        )
 
     # product = ProductSerializer()
 
     class Meta:
         model = models.VendorOrderedItems
-        fields = ("id", "order", "shop", "product", "quantity", "bill")
+        fields = (
+            "id",
+            "order",
+            "shop",
+            "product",
+            "delivery_warehouse",
+            "quantity",
+            "bill",
+        )
         read_only_fields = ("id", "shop", "bill")
 
 

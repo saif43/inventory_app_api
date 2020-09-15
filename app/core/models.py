@@ -62,11 +62,17 @@ class Shop(models.Model):
         return self.name
 
 
-class Salesman(models.Model):
-    """model for salesman object"""
+class Product(models.Model):
+    """Product model"""
 
-    salesman = models.ManyToManyField(User)
+    name = models.CharField(max_length=255)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    buying_price = models.PositiveIntegerField(default=0)
+    selling_price = models.PositiveIntegerField(default=0)
+    stock = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.name
 
 
 class Warehouse(models.Model):
@@ -79,17 +85,16 @@ class Warehouse(models.Model):
         return self.name
 
 
-class Product(models.Model):
-    """Product model"""
+class WareHouseProducts(models.Model):
+    """Model for warehouse products"""
 
-    name = models.CharField(max_length=255)
-    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
-    buying_price = models.PositiveIntegerField(default=0)
-    selling_price = models.PositiveIntegerField(default=0)
-    stock = models.PositiveIntegerField(default=0)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
 
-    def __str__(self):
-        return self.name
+    class Meta:
+        unique_together = ("warehouse", "product")
 
 
 class Customer(models.Model):
@@ -152,7 +157,7 @@ class VendorTrasnscation(models.Model):
 
     order_time = models.DateTimeField(auto_now_add=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    vendor = models.ForeignKey(Vendor, on_delete=None)
 
     def __str__(self):
         return f"Trans {self.pk}---{self.shop}"
@@ -164,8 +169,12 @@ class VendorOrderedItems(models.Model):
     order = models.ForeignKey(VendorTrasnscation, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.PositiveIntegerField(default=0)
+    delivery_warehouse = models.ForeignKey(Warehouse, on_delete=None, null=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
     bill = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ("order", "product", "delivery_warehouse")
 
 
 class VendorTrasnscationBill(models.Model):
