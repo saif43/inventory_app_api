@@ -327,3 +327,59 @@ class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
         model = models.VendorTrasnscationBill
         fields = ("id", "shop", "order", "bill", "paid", "due")
         read_only_fields = ("id", "shop", "bill", "due")
+
+
+class MoveShopToWarehouseSerializer(serializers.ModelSerializer):
+    """Serializer for moving product shop to warehouse"""
+
+    def validate(self, data):
+        try:
+            warehouse = data["warehouse"]
+            product = data["product"]
+            quantity = data["quantity"]
+        except:
+            raise serializers.ValidationError("Please fulfill all fields.")
+
+        warehouse_stock = models.WareHouseProducts.objects.filter(
+            warehouse=warehouse, product=product
+        )
+
+        shop_product = models.Product.objects.get(id=product.pk)
+
+        if shop_product.stock < quantity:
+            raise serializers.ValidationError(
+                "Shop does not have this amount of product."
+            )
+
+        if warehouse_stock.exists():
+            warehouse_stock = warehouse_stock[0]
+
+            warehouse_stock.quantity += quantity
+            shop_product.stock -= quantity
+
+            warehouse_stock.save()
+            shop_product.save()
+        else:
+            models.WareHouseProducts.objects.create(
+                warehouse=warehouse, product=product, quantity=quantity
+            )
+            shop_product.stock -= quantity
+            shop_product.save()
+
+        return data
+
+    def __init__(self, *args, **kwargs):
+        """Filter by shop"""
+
+        super(MoveShopToWarehouseSerializer, self).__init__(*args, **kwargs)
+
+        own_shop = getShop(self.context["request"].user)
+        self.fields["warehouse"].queryset = models.Warehouse.objects.filter(
+            shop=own_shop
+        )
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
+
+    class Meta:
+        model = models.MoveShopToWarehouse
+        fields = ("id", "shop", "warehouse", "product", "quantity")
+        read_only_fields = ("id", "shop")

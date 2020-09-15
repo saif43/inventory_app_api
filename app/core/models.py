@@ -188,3 +188,12 @@ class VendorTrasnscationBill(models.Model):
     bill = models.PositiveIntegerField(default=0)
     paid = models.PositiveIntegerField(default=0)
     due = models.PositiveIntegerField(default=0)
+
+
+class MoveShopToWarehouse(models.Model):
+    """Model for moving product shop to warehouse"""
+
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    warehouse = models.ForeignKey(Warehouse, on_delete=None)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
