@@ -334,6 +334,9 @@ class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
 class MoveProductSerializer(serializers.ModelSerializer):
     """Serializer for moving product shop to warehouse"""
 
+    def __init__(self, *args, **kwargs):
+        super(MoveProductSerializer, self).__init__(*args, **kwargs)
+
     def validate(self, data):
         try:
             warehouse = data["warehouse"]
@@ -367,9 +370,10 @@ class MoveProductSerializer(serializers.ModelSerializer):
                 warehouse_stock.save()
                 shop_product.save()
             else:
+                own_shop = getShop(self.context['request'].user)
                 models.WareHouseProducts.objects.create(
-                    warehouse=warehouse, product=product, quantity=quantity
-                )
+                    warehouse=warehouse, product=product, quantity=quantity, shop=own_shop)
+
                 shop_product.stock -= quantity
                 shop_product.save()
         elif move == "W2S":

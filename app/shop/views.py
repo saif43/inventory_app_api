@@ -51,11 +51,12 @@ class BaseShopAttr(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         own_shop = getShop(self.request.user)
+        print(own_shop)
         serializer.save(shop=own_shop)
 
-    def get_queryset(self):
-        own_shop = getShop(self.request.user)
-        return self.queryset.filter(shop=own_shop)
+    # def get_queryset(self):
+    #     own_shop = getShop(self.request.user)
+    #     return self.queryset.filter(shop=own_shop)
 
 
 class WarehouseViewSet(BaseShopAttr):
@@ -87,7 +88,8 @@ class SalesmanViewSet(APIView):
 
     def get(self, request, format=None):
         queryset = models.User.objects.all()
-        queryset = queryset.filter(created_by=self.request.user, is_salesman=True)
+        queryset = queryset.filter(
+            created_by=self.request.user, is_salesman=True)
         return Response(serializers.SalesmanSerializer(queryset, many=True).data)
 
 
