@@ -133,8 +133,7 @@ class CustomerTrasnscation(models.Model):
 class CustomerOrderedItems(models.Model):
     """Model for keeping customer ordered items"""
 
-    order = models.ForeignKey(CustomerTrasnscation,
-                              on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey(CustomerTrasnscation, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.PositiveIntegerField(default=0)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
@@ -167,12 +166,10 @@ class VendorTrasnscation(models.Model):
 class VendorOrderedItems(models.Model):
     """Model for keeping vendor ordered items"""
 
-    order = models.ForeignKey(
-        VendorTrasnscation, on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey(VendorTrasnscation, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     quantity = models.PositiveIntegerField(default=0)
-    delivery_warehouse = models.ForeignKey(
-        Warehouse, on_delete=None, null=True)
+    delivery_warehouse = models.ForeignKey(Warehouse, on_delete=None, null=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
     bill = models.PositiveIntegerField(default=0)
 
