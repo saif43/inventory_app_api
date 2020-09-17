@@ -21,6 +21,10 @@ def getShop(user):
     if user.is_owner:
         return models.Shop.objects.get(owner=user)
 
+    if user.is_manager or user.is_salesman:
+        created_by = user.created_by
+        return models.Shop.objects.get(owner=created_by)
+
 
 class ShopViewSet(viewsets.ModelViewSet):
     """Manage shops"""
@@ -88,7 +92,8 @@ class SalesmanViewSet(APIView):
 
     def get(self, request, format=None):
         queryset = models.User.objects.all()
-        queryset = queryset.filter(created_by=self.request.user, is_salesman=True)
+        queryset = queryset.filter(
+            created_by=self.request.user, is_salesman=True)
         return Response(serializers.SalesmanSerializer(queryset, many=True).data)
 
 
