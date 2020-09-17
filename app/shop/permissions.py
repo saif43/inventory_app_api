@@ -6,6 +6,10 @@ def getShop(user):
     if user.is_owner:
         return models.Shop.objects.get(owner=user)
 
+    if user.is_manager or user.is_salesman:
+        created_by = user.created_by
+        return models.Shop.objects.get(owner=created_by)
+
 
 class ShopAccessPermission(permissions.BasePermission):
     """Allowing/Restricting user to update their profile"""
@@ -73,7 +77,7 @@ class ProductAccessPermission(permissions.BasePermission):
 
                 if (
                     request.user.is_salesman
-                    and request.method in permissions.SAFE_METHODS
+                    and request.method == 'GET'
                 ):
                     return True
 
