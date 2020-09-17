@@ -23,8 +23,7 @@ class AdminShopSerializer(serializers.ModelSerializer):
         """Shows owner for superuser only"""
 
         super(AdminShopSerializer, self).__init__(*args, **kwargs)
-        self.fields["owner"].queryset = models.User.objects.filter(
-            is_owner=True)
+        self.fields["owner"].queryset = models.User.objects.filter(is_owner=True)
 
     class Meta:
         model = models.Shop
@@ -74,8 +73,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Product
-        fields = ("id", "name", "buying_price",
-                  "selling_price", "stock", "shop")
+        fields = ("id", "name", "buying_price", "selling_price", "stock", "shop")
         read_only_fields = ("id", "shop")
 
 
@@ -106,8 +104,7 @@ class CustomerTrasnscationSerializer(serializers.ModelSerializer):
         super(CustomerTrasnscationSerializer, self).__init__(*args, **kwargs)
 
         own_shop = models.Shop.objects.get(owner=self.context["request"].user)
-        self.fields["customer"].queryset = models.Customer.objects.filter(
-            shop=own_shop)
+        self.fields["customer"].queryset = models.Customer.objects.filter(shop=own_shop)
 
     class Meta:
         model = models.CustomerTrasnscation
@@ -155,8 +152,7 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
         super(CustomerOrderedItemsSerializer, self).__init__(*args, **kwargs)
 
         own_shop = models.Shop.objects.get(owner=self.context["request"].user)
-        self.fields["product"].queryset = models.Product.objects.filter(
-            shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
         self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
             shop=own_shop
         )
@@ -179,8 +175,7 @@ class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         """Filter customers by shop"""
 
-        super(CustomerTrasnscationBillSerializer,
-              self).__init__(*args, **kwargs)
+        super(CustomerTrasnscationBillSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
         self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
@@ -214,8 +209,7 @@ class VendorTrasnscationSerializer(serializers.ModelSerializer):
         super(VendorTrasnscationSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
-        self.fields["vendor"].queryset = models.Vendor.objects.filter(
-            shop=own_shop)
+        self.fields["vendor"].queryset = models.Vendor.objects.filter(shop=own_shop)
 
     class Meta:
         model = models.VendorTrasnscation
@@ -238,8 +232,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         if order is None:
             raise serializers.ValidationError("No order has been selected.")
         if warehouse is None:
-            raise serializers.ValidationError(
-                "No warehouse has been selected.")
+            raise serializers.ValidationError("No warehouse has been selected.")
 
         data["bill"] = product.buying_price * quantity
 
@@ -256,8 +249,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         super(VendorOrderedItemsSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
-        self.fields["product"].queryset = models.Product.objects.filter(
-            shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
         self.fields["order"].queryset = models.VendorTrasnscation.objects.filter(
             shop=own_shop
         )
@@ -370,9 +362,13 @@ class MoveProductSerializer(serializers.ModelSerializer):
                 warehouse_stock.save()
                 shop_product.save()
             else:
-                own_shop = getShop(self.context['request'].user)
+                own_shop = getShop(self.context["request"].user)
                 models.WareHouseProducts.objects.create(
-                    warehouse=warehouse, product=product, quantity=quantity, shop=own_shop)
+                    warehouse=warehouse,
+                    product=product,
+                    quantity=quantity,
+                    shop=own_shop,
+                )
 
                 shop_product.stock -= quantity
                 shop_product.save()
@@ -410,8 +406,7 @@ class MoveProductSerializer(serializers.ModelSerializer):
         self.fields["warehouse"].queryset = models.Warehouse.objects.filter(
             shop=own_shop
         )
-        self.fields["product"].queryset = models.Product.objects.filter(
-            shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
 
     class Meta:
         model = models.MoveProduct
