@@ -139,11 +139,11 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
         own_shop = getShop(self.request.user)
         return self.queryset.filter(shop=own_shop)
 
-    def get_serializer_class(self):
-        if self.action == "list":
-            return serializers.CustomerTrasnscationProductDetailSerializer
+    # def get_serializer_class(self):
+    #     if self.action in ["list", "retrieve"]:
+    #         return serializers.CustomerTrasnscationProductDetailSerializer
 
-        return self.serializer_class
+    #     return self.serializer_class
 
     # def retrieve(self, request, *args, **kwargs):
     #     """overriding retrieve function, to get result of list of transaction filtered by order_id"""

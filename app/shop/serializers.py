@@ -63,6 +63,20 @@ class WarehouseProductsSerializer(serializers.ModelSerializer):
         fields = ("id", "warehouse", "product", "quantity", "shop")
         read_only_fields = ("id", "shop")
 
+    def to_representation(self, instance):
+        """For the nested represtation"""
+
+        response = super().to_representation(instance)
+        response["product"] = ProductSerializer(instance.product).data
+        response["warehouse"] = WarehouseSerializer(instance.product).data
+
+        response["product"].pop("buying_price")
+        response["product"].pop("stock")
+        response["product"].pop("shop")
+
+        response["warehouse"].pop("shop")
+        return response
+
 
 class SalesmanSerializer(serializers.Serializer):
     """Serializer for salesman list"""
@@ -161,12 +175,19 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
             shop=own_shop
         )
 
-    # product = ProductSerializer()
-
     class Meta:
         model = models.CustomerOrderedItems
         fields = ("id", "order", "shop", "product", "quantity", "bill")
         read_only_fields = ("id", "shop", "bill")
+
+    def to_representation(self, instance):
+        """For the nested represtation"""
+
+        response = super().to_representation(instance)
+        response["product"] = ProductSerializer(instance.product).data
+        response["product"].pop("buying_price")
+        response["product"].pop("shop")
+        return response
 
 
 class CustomerTrasnscationProductDetailSerializer(CustomerOrderedItemsSerializer):
@@ -275,6 +296,15 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
             "bill",
         )
         read_only_fields = ("id", "shop", "bill")
+
+    def to_representation(self, instance):
+        """For the nested represtation"""
+
+        response = super().to_representation(instance)
+        response["product"] = ProductSerializer(instance.product).data
+        response["product"].pop("selling_price")
+        response["product"].pop("shop")
+        return response
 
 
 class VendorTrasnscationProductDetailSerializer(VendorOrderedItemsSerializer):
