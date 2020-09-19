@@ -75,10 +75,7 @@ class ProductAccessPermission(permissions.BasePermission):
                 ]:
                     return True
 
-                if (
-                    request.user.is_salesman
-                    and request.method == 'GET'
-                ):
+                if request.user.is_salesman and request.method == "GET":
                     return True
 
         except:
@@ -139,6 +136,29 @@ class CustomerTransactionPermission(permissions.BasePermission):
                 if (
                     request.user.is_manager or request.user.is_salesman
                 ) and request.method in ["POST", "GET", "PUT", "PATCH"]:
+                    return True
+        except:
+            pass
+
+
+class CustomerOrderedItemsPermission(permissions.BasePermission):
+    """Allowing/Restricting user to access the transactions"""
+
+    message = "PATCH method not allowed | You must have a shop to access this."
+
+    def has_permission(self, request, obj):
+        try:
+            if request.method == "PATCH":
+                """ we are restricting PATCH method to stock calculation purpose"""
+                return False
+
+            if getShop(request.user):
+                if request.user.is_owner:
+                    return True
+
+                if (
+                    request.user.is_manager or request.user.is_salesman
+                ) and request.method in ["POST", "GET", "PUT"]:
                     return True
         except:
             pass

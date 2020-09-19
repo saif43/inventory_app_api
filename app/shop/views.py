@@ -14,6 +14,7 @@ from shop.permissions import (
     CustomerAccessPermission,
     VendorAccessPermission,
     CustomerTransactionPermission,
+    CustomerOrderedItemsPermission,
 )
 
 
@@ -126,7 +127,7 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     queryset = models.CustomerOrderedItems.objects.all()
     serializer_class = serializers.CustomerOrderedItemsSerializer
-    permission_classes = (CustomerTransactionPermission,)
+    permission_classes = (CustomerOrderedItemsPermission,)
 
     filter_backends = (filters.SearchFilter,)
     search_fields = ("order__id",)
@@ -139,11 +140,11 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
         own_shop = getShop(self.request.user)
         return self.queryset.filter(shop=own_shop)
 
-    # def get_serializer_class(self):
-    #     if self.action in ["list", "retrieve"]:
-    #         return serializers.CustomerTrasnscationProductDetailSerializer
+    def get_serializer_class(self):
+        if self.request.method in ["PUT", "PATCH"]:
+            return serializers.CustomerOrderedItemsUpdateSerializer
 
-    #     return self.serializer_class
+        return self.serializer_class
 
     # def retrieve(self, request, *args, **kwargs):
     #     """overriding retrieve function, to get result of list of transaction filtered by order_id"""

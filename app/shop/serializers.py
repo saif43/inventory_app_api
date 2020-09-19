@@ -135,9 +135,9 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         product = data["product"]
+        data["product_detail"] = data["product"]
         quantity = data["quantity"]
         order = data["order"]
-        # bill = data['bill']
 
         if product is None:
             raise serializers.ValidationError("No product has been selected.")
@@ -148,7 +148,6 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
             product=product, order=order
         )
 
-        # print(models.Product.objects.get(pk=product.id).price == product.price)
         data["bill"] = product.selling_price * quantity
 
         if exists:
@@ -177,21 +176,56 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.CustomerOrderedItems
-        fields = ("id", "order", "shop", "product", "quantity", "bill")
-        read_only_fields = ("id", "shop", "bill")
+        fields = (
+            "id",
+            "order",
+            "shop",
+            "product",
+            "product_detail",
+            "quantity",
+            "bill",
+        )
+        read_only_fields = ("id", "shop", "bill", "product_detail")
 
     def to_representation(self, instance):
         """For the nested represtation"""
 
         response = super().to_representation(instance)
-        response["product"] = ProductSerializer(instance.product).data
-        response["product"].pop("buying_price")
-        response["product"].pop("shop")
+        response["product_detail"] = ProductSerializer(instance.product).data
+        response["product_detail"].pop("buying_price")
+        response["product_detail"].pop("shop")
         return response
 
 
-class CustomerTrasnscationProductDetailSerializer(CustomerOrderedItemsSerializer):
-    product = ProductSerializer()
+class CustomerOrderedItemsUpdateSerializer(CustomerOrderedItemsSerializer):
+    """Update Serializer for ordered products"""
+
+    def validate(self, data):
+        product = data["product"]
+        quantity = data["quantity"]
+        order = data["order"]
+
+        if product is None:
+            raise serializers.ValidationError("No product has been selected.")
+        if order is None:
+            raise serializers.ValidationError("No order has been selected.")
+
+        exists = models.CustomerOrderedItems.objects.filter(
+            product=product, order=order
+        )[0]
+
+        stock = product.stock + exists.quantity
+        stock -= quantity
+
+        data["bill"] = product.selling_price * quantity
+
+        if stock < 0:
+            raise serializers.ValidationError("Insufficient stock.")
+
+        product.stock = stock
+        product.save()
+
+        return data
 
 
 class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):

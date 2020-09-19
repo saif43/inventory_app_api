@@ -135,6 +135,9 @@ class CustomerOrderedItems(models.Model):
 
     order = models.ForeignKey(CustomerTrasnscation, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    product_detail = models.ForeignKey(
+        Product, on_delete=models.CASCADE, null=True, related_name="product_detail"
+    )
     quantity = models.PositiveIntegerField(default=0)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
     bill = models.PositiveIntegerField(default=0)
