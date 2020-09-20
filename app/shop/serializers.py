@@ -245,18 +245,27 @@ class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
         order = data["order"]
         total_bill = 0
 
+        previous_paid = models.CustomerTrasnscationBill.objects.get(
+            id=self.instance.id
+        ).paid
+        new_paid = data["paid"]
+
+        shop = self.instance.shop
+
         orders = models.CustomerOrderedItems.objects.filter(order=order)
 
         for i in orders:
             total_bill += i.bill
 
         data["bill"] = total_bill
+        data["due"] = total_bill - previous_paid - new_paid
+
         return data
 
     class Meta:
         model = models.CustomerTrasnscationBill
-        fields = ("id", "shop", "order", "bill", "paid")
-        read_only_fields = ("id", "shop", "bill")
+        fields = ("id", "shop", "order", "bill", "paid", "due")
+        read_only_fields = ("id", "shop", "bill", "due")
 
 
 class VendorTrasnscationSerializer(serializers.ModelSerializer):
@@ -281,10 +290,10 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         product = data["product"]
+        data["product_detail"] = data["product"]
         quantity = data["quantity"]
         order = data["order"]
         warehouse = data["delivery_warehouse"]
-        # bill = data['bill']
 
         if product is None:
             raise serializers.ValidationError("No product has been selected.")
@@ -316,8 +325,6 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
             shop=own_shop
         )
 
-    # product = ProductSerializer()
-
     class Meta:
         model = models.VendorOrderedItems
         fields = (
@@ -325,11 +332,17 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
             "order",
             "shop",
             "product",
+            "product_detail",
             "delivery_warehouse",
             "quantity",
             "bill",
         )
-        read_only_fields = ("id", "shop", "bill")
+        read_only_fields = (
+            "id",
+            "shop",
+            "bill",
+            "product_detail",
+        )
 
     def to_representation(self, instance):
         """For the nested represtation"""
@@ -339,10 +352,6 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         response["product"].pop("selling_price")
         response["product"].pop("shop")
         return response
-
-
-class VendorTrasnscationProductDetailSerializer(VendorOrderedItemsSerializer):
-    product = ProductSerializer()
 
 
 class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
@@ -361,7 +370,7 @@ class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
     def validate(self, data):
         order = data["order"]
 
-        previos_paid = models.VendorTrasnscationBill.objects.get(
+        previous_paid = models.VendorTrasnscationBill.objects.get(
             id=self.instance.id
         ).paid
         new_paid = data["paid"]
@@ -378,7 +387,7 @@ class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Not enough money.")
 
         data["bill"] = total_bill
-        data["due"] = total_bill - previos_paid - new_paid
+        data["due"] = total_bill - previous_paid - new_paid
 
         shop.money -= new_paid
         shop.save()

@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models import signals
 from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
@@ -153,6 +155,35 @@ class CustomerTrasnscationBill(models.Model):
     )
     bill = models.PositiveIntegerField(default=0)
     paid = models.PositiveIntegerField(default=0)
+    due = models.PositiveIntegerField(default=0)
+
+
+@receiver(signals.post_save, sender=CustomerTrasnscation)
+def create_customer_bill(sender, instance, created, **kwargs):
+    """Auto create bill, when customer creates a Transaction"""
+
+    if created:
+        CustomerTrasnscationBill.objects.create(
+            order=instance, paid=0, shop=instance.shop
+        )
+
+
+@receiver(signals.post_save, sender=CustomerOrderedItems)
+def update_customer_bill(sender, instance, created, **kwargs):
+    """Auto create bill, when customer creates a Transaction"""
+
+    if created:
+        bill_object = CustomerTrasnscationBill.objects.filter(order=instance.order)[0]
+
+        order_object = CustomerOrderedItems.objects.filter(order=instance.order)
+
+        bill = 0
+
+        for i in order_object:
+            bill += i.bill
+
+        bill_object.bill = bill
+        bill_object.save()
 
 
 class VendorTrasnscation(models.Model):
@@ -171,6 +202,12 @@ class VendorOrderedItems(models.Model):
 
     order = models.ForeignKey(VendorTrasnscation, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    product_detail = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="vendor_product_detail",
+    )
     quantity = models.PositiveIntegerField(default=0)
     delivery_warehouse = models.ForeignKey(Warehouse, on_delete=None, null=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
@@ -191,6 +228,34 @@ class VendorTrasnscationBill(models.Model):
     bill = models.PositiveIntegerField(default=0)
     paid = models.PositiveIntegerField(default=0)
     due = models.PositiveIntegerField(default=0)
+
+
+@receiver(signals.post_save, sender=VendorTrasnscation)
+def create_vendor_bill(sender, instance, created, **kwargs):
+    """Auto create bill, when vendor creates a Transaction"""
+
+    if created:
+        VendorTrasnscationBill.objects.create(
+            order=instance, paid=0, shop=instance.shop
+        )
+
+
+@receiver(signals.post_save, sender=VendorOrderedItems)
+def update_vendor_bill(sender, instance, created, **kwargs):
+    """Auto update bill, when vendor updates a Transaction"""
+
+    if created:
+        bill_object = VendorTrasnscationBill.objects.filter(order=instance.order)[0]
+
+        order_object = VendorOrderedItems.objects.filter(order=instance.order)
+
+        bill = 0
+
+        for i in order_object:
+            bill += i.bill
+
+        bill_object.bill = bill
+        bill_object.save()
 
 
 class MoveProduct(models.Model):
