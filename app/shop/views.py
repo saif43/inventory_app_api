@@ -16,6 +16,7 @@ from shop.permissions import (
     CustomerTransactionPermission,
     CustomerOrderedItemsPermission,
     CustomerTrasnscationBillPermission,
+    MoveProductPermission,
 )
 
 
@@ -94,7 +95,20 @@ class SalesmanViewSet(APIView):
 
     def get(self, request, format=None):
         queryset = models.User.objects.all()
-        queryset = queryset.filter(created_by=self.request.user, is_salesman=True)
+        queryset = queryset.filter(
+            created_by=getShop(self.request.user).owner, is_salesman=True
+        )
+        return Response(serializers.SalesmanSerializer(queryset, many=True).data)
+
+
+class ManagerViewSet(APIView):
+    authentication_classes = (TokenAuthentication,)
+
+    def get(self, request, format=None):
+        queryset = models.User.objects.all()
+        queryset = queryset.filter(
+            created_by=getShop(self.request.user).owner, is_salesman=True
+        )
         return Response(serializers.SalesmanSerializer(queryset, many=True).data)
 
 
@@ -131,7 +145,13 @@ class CustomerOrderedItemsViewSet(viewsets.ModelViewSet):
     permission_classes = (CustomerOrderedItemsPermission,)
 
     filter_backends = (filters.SearchFilter,)
-    search_fields = ("order__id",)
+    search_fields = ("=order__id",)
+    """
+    '^' Starts-with search.
+    '=' Exact matches.
+    '@' Full-text search. (Currently only supported Django's PostgreSQL backend.)
+    '$' Regex search.
+    """
 
     def perform_create(self, serializer):
         own_shop = getShop(self.request.user)
@@ -198,7 +218,7 @@ class VendorOrderedItemsViewSet(viewsets.ModelViewSet):
     permission_classes = (CustomerOrderedItemsPermission,)
 
     filter_backends = (filters.SearchFilter,)
-    search_fields = ("order__id",)
+    search_fields = ("=order__id",)
 
     def perform_create(self, serializer):
         own_shop = getShop(self.request.user)
@@ -222,4 +242,4 @@ class MoveProductViewSet(BaseShopAttr):
 
     queryset = models.MoveProduct.objects.all()
     serializer_class = serializers.MoveProductSerializer
-    permission_classes = (CustomerTransactionPermission,)
+    permission_classes = (MoveProductPermission,)

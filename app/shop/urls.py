@@ -23,4 +23,5 @@ app_name = "shop"
 urlpatterns = [
     path("", include(router.urls)),
     path("salesman/", views.SalesmanViewSet.as_view(), name="salesman"),
+    path("manager/", views.ManagerViewSet.as_view(), name="manager"),
 ]

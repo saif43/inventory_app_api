@@ -144,6 +144,9 @@ class CustomerOrderedItems(models.Model):
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
     bill = models.PositiveIntegerField(default=0)
 
+    class Meta:
+        unique_together = ("order", "shop", "product")
+
 
 class CustomerTrasnscationBill(models.Model):
     """Model for tracking the bill of a transaction"""
@@ -214,7 +217,7 @@ class VendorOrderedItems(models.Model):
     bill = models.PositiveIntegerField(default=0)
 
     class Meta:
-        unique_together = ("order", "product", "delivery_warehouse")
+        unique_together = ("order", "shop", "product", "delivery_warehouse")
 
 
 class VendorTrasnscationBill(models.Model):

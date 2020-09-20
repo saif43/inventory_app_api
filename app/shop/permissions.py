@@ -179,3 +179,16 @@ class CustomerOrderedItemsPermission(permissions.BasePermission):
                     return True
         except:
             pass
+
+
+class MoveProductPermission(permissions.BasePermission):
+    """Allowing/Restricting user to access the transactions"""
+
+    message = "Mehtod allowed: GET | You must have a shop to access this."
+
+    def has_permission(self, request, obj):
+        try:
+            if getShop(request.user) and request.method in ["GET", "POST"]:
+                return True
+        except:
+            pass

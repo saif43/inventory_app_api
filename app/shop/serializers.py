@@ -242,7 +242,7 @@ class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        order = data["order"]
+        order = self.instance.order
         total_bill = 0
 
         previous_paid = models.CustomerTrasnscationBill.objects.get(
@@ -259,13 +259,14 @@ class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
 
         data["bill"] = total_bill
         data["due"] = total_bill - previous_paid - new_paid
+        data["paid"] = previous_paid + new_paid
 
         return data
 
     class Meta:
         model = models.CustomerTrasnscationBill
         fields = ("id", "shop", "order", "bill", "paid", "due")
-        read_only_fields = ("id", "shop", "bill", "due")
+        read_only_fields = ("id", "shop", "order", "bill", "due")
 
 
 class VendorTrasnscationSerializer(serializers.ModelSerializer):
@@ -348,9 +349,9 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         """For the nested represtation"""
 
         response = super().to_representation(instance)
-        response["product"] = ProductSerializer(instance.product).data
-        response["product"].pop("selling_price")
-        response["product"].pop("shop")
+        response["product_detail"] = ProductSerializer(instance.product).data
+        response["product_detail"].pop("selling_price")
+        response["product_detail"].pop("shop")
         return response
 
 
@@ -368,7 +369,7 @@ class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        order = data["order"]
+        order = self.instance.order
 
         previous_paid = models.VendorTrasnscationBill.objects.get(
             id=self.instance.id
@@ -388,6 +389,7 @@ class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
 
         data["bill"] = total_bill
         data["due"] = total_bill - previous_paid - new_paid
+        data["paid"] = previous_paid + new_paid
 
         shop.money -= new_paid
         shop.save()
@@ -397,7 +399,7 @@ class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.VendorTrasnscationBill
         fields = ("id", "shop", "order", "bill", "paid", "due")
-        read_only_fields = ("id", "shop", "bill", "due")
+        read_only_fields = ("id", "order", "shop", "bill", "due")
 
 
 class MoveProductSerializer(serializers.ModelSerializer):
