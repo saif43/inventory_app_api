@@ -107,7 +107,7 @@ class ManagerViewSet(APIView):
     def get(self, request, format=None):
         queryset = models.User.objects.all()
         queryset = queryset.filter(
-            created_by=getShop(self.request.user).owner, is_salesman=True
+            created_by=getShop(self.request.user).owner, is_manager=True
         )
         return Response(serializers.SalesmanSerializer(queryset, many=True).data)
 
