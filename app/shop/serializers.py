@@ -261,6 +261,12 @@ class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
         data["due"] = total_bill - previous_paid - new_paid
         data["paid"] = previous_paid + new_paid
 
+        if data["paid"] > total_bill:
+            raise serializers.ValidationError("Over paid")
+
+        shop.money += new_paid
+        shop.save()
+
         return data
 
     class Meta:
@@ -390,6 +396,9 @@ class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
         data["bill"] = total_bill
         data["due"] = total_bill - previous_paid - new_paid
         data["paid"] = previous_paid + new_paid
+
+        if data["paid"] > total_bill:
+            raise serializers.ValidationError("Over paid")
 
         shop.money -= new_paid
         shop.save()
