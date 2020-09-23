@@ -27,7 +27,8 @@ class AdminShopSerializer(serializers.ModelSerializer):
         """Shows owner for superuser only"""
 
         super(AdminShopSerializer, self).__init__(*args, **kwargs)
-        self.fields["owner"].queryset = models.User.objects.filter(is_owner=True)
+        self.fields["owner"].queryset = models.User.objects.filter(
+            is_owner=True)
 
     class Meta:
         model = models.Shop
@@ -91,7 +92,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Product
-        fields = ("id", "name", "buying_price", "selling_price", "stock", "shop")
+        fields = ("id", "name", "buying_price",
+                  "selling_price", "stock", "shop")
         read_only_fields = ("id", "shop")
 
 
@@ -122,7 +124,8 @@ class CustomerTrasnscationSerializer(serializers.ModelSerializer):
         super(CustomerTrasnscationSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(user=self.context["request"].user)
-        self.fields["customer"].queryset = models.Customer.objects.filter(shop=own_shop)
+        self.fields["customer"].queryset = models.Customer.objects.filter(
+            shop=own_shop)
 
     class Meta:
         model = models.CustomerTrasnscation
@@ -136,6 +139,7 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
     def validate(self, data):
         product = data["product"]
         data["product_detail"] = data["product"]
+        data["selling_price"] = product.selling_price
         quantity = data["quantity"]
         order = data["order"]
 
@@ -169,7 +173,8 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
         super(CustomerOrderedItemsSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(user=self.context["request"].user)
-        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(
+            shop=own_shop)
         self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
             shop=own_shop
         )
@@ -182,10 +187,12 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
             "shop",
             "product",
             "product_detail",
+            "selling_price",
             "quantity",
             "bill",
         )
-        read_only_fields = ("id", "shop", "bill", "product_detail")
+        read_only_fields = ("id", "shop", "bill",
+                            "product_detail", "selling_price")
 
     def to_representation(self, instance):
         """For the nested represtation"""
@@ -234,7 +241,8 @@ class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         """Filter customers by shop"""
 
-        super(CustomerTrasnscationBillSerializer, self).__init__(*args, **kwargs)
+        super(CustomerTrasnscationBillSerializer,
+              self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
         self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
@@ -284,7 +292,8 @@ class VendorTrasnscationSerializer(serializers.ModelSerializer):
         super(VendorTrasnscationSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
-        self.fields["vendor"].queryset = models.Vendor.objects.filter(shop=own_shop)
+        self.fields["vendor"].queryset = models.Vendor.objects.filter(
+            shop=own_shop)
 
     class Meta:
         model = models.VendorTrasnscation
@@ -298,6 +307,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
     def validate(self, data):
         product = data["product"]
         data["product_detail"] = data["product"]
+        data["buying_price"] = product.buying_price
         quantity = data["quantity"]
         order = data["order"]
         warehouse = data["delivery_warehouse"]
@@ -307,7 +317,8 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         if order is None:
             raise serializers.ValidationError("No order has been selected.")
         if warehouse is None:
-            raise serializers.ValidationError("No warehouse has been selected.")
+            raise serializers.ValidationError(
+                "No warehouse has been selected.")
 
         data["bill"] = product.buying_price * quantity
 
@@ -324,7 +335,8 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         super(VendorOrderedItemsSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
-        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(
+            shop=own_shop)
         self.fields["order"].queryset = models.VendorTrasnscation.objects.filter(
             shop=own_shop
         )
@@ -339,6 +351,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
             "order",
             "shop",
             "product",
+            "buying_price",
             "product_detail",
             "delivery_warehouse",
             "quantity",
@@ -349,6 +362,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
             "shop",
             "bill",
             "product_detail",
+            "buying_price"
         )
 
     def to_representation(self, instance):
@@ -494,7 +508,8 @@ class MoveProductSerializer(serializers.ModelSerializer):
         self.fields["warehouse"].queryset = models.Warehouse.objects.filter(
             shop=own_shop
         )
-        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(
+            shop=own_shop)
 
     class Meta:
         model = models.MoveProduct
