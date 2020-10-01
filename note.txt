@@ -1,0 +1,9 @@
+Filter in Bill
+Avg price in product
+Client due list
+Vendor due list
+product stock alert
+Sell by day
+Purchase by day
+Expense
+Vendor order transaction image
