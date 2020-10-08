@@ -158,6 +158,16 @@ class CustomerTrasnscationBillPermission(permissions.BasePermission):
             pass
 
 
+class CustomerTrasnscationDueListPermission(permissions.BasePermission):
+    """Allowing/Restricting user to access the transactions"""
+
+    message = "Mehtod allowed: GET | You must have a shop to access this."
+
+    def has_permission(self, request, obj):
+        if getShop(request.user) and request.method in permissions.SAFE_METHODS:
+            return True
+
+
 class CustomerOrderedItemsPermission(permissions.BasePermission):
     """Allowing/Restricting user to access the transactions"""
 

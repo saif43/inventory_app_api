@@ -1,7 +1,7 @@
 from core import models
 from shop import serializers
 
-from rest_framework import viewsets, status, filters
+from rest_framework import viewsets, status, filters, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -16,6 +16,7 @@ from shop.permissions import (
     CustomerTransactionPermission,
     CustomerOrderedItemsPermission,
     CustomerTrasnscationBillPermission,
+    CustomerTrasnscationDueListPermission,
     MoveProductPermission,
 )
 
@@ -208,6 +209,17 @@ class CustomerTrasnscationBillViewSet(BaseShopAttr):
     '@' Full-text search. (Currently only supported Django's PostgreSQL backend.)
     '$' Regex search.
     """
+
+
+class CustomerDueListViewSet(BaseShopAttr):
+    """Show customer transactions who has due"""
+
+    serializer_class = serializers.CustomerTrasnscationBillSerializer
+    permission_classes = (CustomerTrasnscationDueListPermission,)
+
+    def get_queryset(self):
+        own_shop = getShop(self.request.user)
+        return models.CustomerTrasnscationBill.objects.filter(shop=own_shop, due__gt=0)
 
 
 class VendorTrasnscationViewSet(BaseShopAttr):
