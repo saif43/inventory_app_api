@@ -93,7 +93,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Product
         fields = ("id", "name", "buying_price",
-                  "selling_price", "stock", "shop")
+                  "selling_price", "stock", "stock_alert_amount", "shop")
         read_only_fields = ("id", "shop")
 
 

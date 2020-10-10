@@ -72,6 +72,7 @@ class Product(models.Model):
     buying_price = models.PositiveIntegerField(default=0)
     selling_price = models.PositiveIntegerField(default=0)
     stock = models.PositiveIntegerField(default=0)
+    stock_alert_amount = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name

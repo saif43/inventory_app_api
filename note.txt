@@ -2,7 +2,7 @@ Filter in Bill----------------------Done
 Avg price in product
 Client due list---------------------Done
 Vendor due list---------------------Done
-product stock alert
+product stock alert-----------------Done
 Sell by day
 Purchase by day
 Expense
