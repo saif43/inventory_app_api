@@ -5,5 +5,5 @@ Vendor due list---------------------Done
 product stock alert-----------------Done
 Sell by day
 Purchase by day
-Expense
+Expense-----------------------------Done
 Vendor order transaction image
