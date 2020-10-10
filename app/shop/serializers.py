@@ -16,10 +16,15 @@ class ShopSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Shop
-        fields = ("id", "name", "money", "owner",
-                  "created_timestamp", "modified_timestamp")
-        read_only_fields = (
-            "id", "owner", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "name",
+            "money",
+            "owner",
+            "created_timestamp",
+            "modified_timestamp",
+        )
+        read_only_fields = ("id", "owner", "created_timestamp", "modified_timestamp")
 
 
 class AdminShopSerializer(serializers.ModelSerializer):
@@ -29,13 +34,18 @@ class AdminShopSerializer(serializers.ModelSerializer):
         """Shows owner for superuser only"""
 
         super(AdminShopSerializer, self).__init__(*args, **kwargs)
-        self.fields["owner"].queryset = models.User.objects.filter(
-            is_owner=True)
+        self.fields["owner"].queryset = models.User.objects.filter(is_owner=True)
 
     class Meta:
         model = models.Shop
-        fields = ("id", "name", "money", "owner",
-                  "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "name",
+            "money",
+            "owner",
+            "created_timestamp",
+            "modified_timestamp",
+        )
         read_only_fields = ("id", "created_timestamp", "modified_timestamp")
 
     def validate(self, data):
@@ -55,10 +65,8 @@ class WarehouseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Warehouse
-        fields = ("id", "name", "shop",
-                  "created_timestamp", "modified_timestamp")
-        read_only_fields = (
-            "id", "shop", "created_timestamp", "modified_timestamp")
+        fields = ("id", "name", "shop", "created_timestamp", "modified_timestamp")
+        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
 
 
 class WarehouseProductsSerializer(serializers.ModelSerializer):
@@ -66,10 +74,16 @@ class WarehouseProductsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.WareHouseProducts
-        fields = ("id", "warehouse", "product", "quantity", "shop",
-                  "created_timestamp", "modified_timestamp")
-        read_only_fields = (
-            "id", "shop", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "warehouse",
+            "product",
+            "quantity",
+            "shop",
+            "created_timestamp",
+            "modified_timestamp",
+        )
+        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
 
     def to_representation(self, instance):
         """For the nested represtation"""
@@ -99,10 +113,18 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Product
-        fields = ("id", "name", "buying_price", "selling_price", "stock",
-                  "stock_alert_amount", "shop", "created_timestamp", "modified_timestamp")
-        read_only_fields = (
-            "id", "shop", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "name",
+            "buying_price",
+            "selling_price",
+            "stock",
+            "stock_alert_amount",
+            "shop",
+            "created_timestamp",
+            "modified_timestamp",
+        )
+        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -110,10 +132,15 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Customer
-        fields = ("id", "name", "contact", "shop",
-                  "created_timestamp", "modified_timestamp")
-        read_only_fields = (
-            "id", "shop", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "name",
+            "contact",
+            "shop",
+            "created_timestamp",
+            "modified_timestamp",
+        )
+        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
 
 
 class VendorSerializer(serializers.ModelSerializer):
@@ -121,10 +148,15 @@ class VendorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Vendor
-        fields = ("id", "name", "contact", "shop",
-                  "created_timestamp", "modified_timestamp")
-        read_only_fields = (
-            "id", "shop", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "name",
+            "contact",
+            "shop",
+            "created_timestamp",
+            "modified_timestamp",
+        )
+        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
 
 
 class CustomerTrasnscationSerializer(serializers.ModelSerializer):
@@ -136,15 +168,12 @@ class CustomerTrasnscationSerializer(serializers.ModelSerializer):
         super(CustomerTrasnscationSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(user=self.context["request"].user)
-        self.fields["customer"].queryset = models.Customer.objects.filter(
-            shop=own_shop)
+        self.fields["customer"].queryset = models.Customer.objects.filter(shop=own_shop)
 
     class Meta:
         model = models.CustomerTrasnscation
-        fields = ("id", "shop", "customer",
-                  "created_timestamp", "modified_timestamp")
-        read_only_fields = (
-            "id", "shop", "created_timestamp", "modified_timestamp")
+        fields = ("id", "shop", "customer", "created_timestamp", "modified_timestamp")
+        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
 
 
 class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
@@ -187,18 +216,34 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
         super(CustomerOrderedItemsSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(user=self.context["request"].user)
-        self.fields["product"].queryset = models.Product.objects.filter(
-            shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
         self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
             shop=own_shop
         )
 
     class Meta:
         model = models.CustomerOrderedItems
-        fields = ("id", "order", "shop", "product", "product_detail", "selling_price",
-                  "quantity", "bill", "created_timestamp", "modified_timestamp")
-        read_only_fields = ("id", "shop", "bill",
-                            "product_detail", "selling_price", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "order",
+            "shop",
+            "product",
+            "product_detail",
+            "selling_price",
+            "quantity",
+            "bill",
+            "created_timestamp",
+            "modified_timestamp",
+        )
+        read_only_fields = (
+            "id",
+            "shop",
+            "bill",
+            "product_detail",
+            "selling_price",
+            "created_timestamp",
+            "modified_timestamp",
+        )
 
     def to_representation(self, instance):
         """For the nested represtation"""
@@ -247,8 +292,7 @@ class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         """Filter customers by shop"""
 
-        super(CustomerTrasnscationBillSerializer,
-              self).__init__(*args, **kwargs)
+        super(CustomerTrasnscationBillSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
         self.fields["order"].queryset = models.CustomerTrasnscation.objects.filter(
@@ -285,10 +329,25 @@ class CustomerTrasnscationBillSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.CustomerTrasnscationBill
-        fields = ("id", "shop", "order", "bill", "paid", "due",
-                  "created_timestamp", "modified_timestamp")
-        read_only_fields = ("id", "shop", "order", "bill",
-                            "due", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "shop",
+            "order",
+            "bill",
+            "paid",
+            "due",
+            "created_timestamp",
+            "modified_timestamp",
+        )
+        read_only_fields = (
+            "id",
+            "shop",
+            "order",
+            "bill",
+            "due",
+            "created_timestamp",
+            "modified_timestamp",
+        )
 
 
 class VendorTrasnscationSerializer(serializers.ModelSerializer):
@@ -300,15 +359,12 @@ class VendorTrasnscationSerializer(serializers.ModelSerializer):
         super(VendorTrasnscationSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
-        self.fields["vendor"].queryset = models.Vendor.objects.filter(
-            shop=own_shop)
+        self.fields["vendor"].queryset = models.Vendor.objects.filter(shop=own_shop)
 
     class Meta:
         model = models.VendorTrasnscation
-        fields = ("id", "shop", "vendor",
-                  "created_timestamp", "modified_timestamp")
-        read_only_fields = (
-            "id", "shop", "created_timestamp", "modified_timestamp")
+        fields = ("id", "shop", "vendor", "created_timestamp", "modified_timestamp")
+        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
 
 
 class VendorOrderedItemsSerializer(serializers.ModelSerializer):
@@ -327,8 +383,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         if order is None:
             raise serializers.ValidationError("No order has been selected.")
         if warehouse is None:
-            raise serializers.ValidationError(
-                "No warehouse has been selected.")
+            raise serializers.ValidationError("No warehouse has been selected.")
 
         data["bill"] = product.buying_price * quantity
 
@@ -345,8 +400,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         super(VendorOrderedItemsSerializer, self).__init__(*args, **kwargs)
 
         own_shop = getShop(self.context["request"].user)
-        self.fields["product"].queryset = models.Product.objects.filter(
-            shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
         self.fields["order"].queryset = models.VendorTrasnscation.objects.filter(
             shop=own_shop
         )
@@ -356,8 +410,19 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.VendorOrderedItems
-        fields = ("id", "order", "shop", "product", "buying_price", "product_detail",
-                  "delivery_warehouse", "quantity", "bill", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "order",
+            "shop",
+            "product",
+            "buying_price",
+            "product_detail",
+            "delivery_warehouse",
+            "quantity",
+            "bill",
+            "created_timestamp",
+            "modified_timestamp",
+        )
         read_only_fields = (
             "id",
             "shop",
@@ -365,7 +430,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
             "product_detail",
             "buying_price",
             "created_timestamp",
-            "modified_timestamp"
+            "modified_timestamp",
         )
 
     def to_representation(self, instance):
@@ -424,10 +489,25 @@ class VendorTrasnscationBillSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.VendorTrasnscationBill
-        fields = ("id", "shop", "order", "bill", "paid", "due",
-                  "created_timestamp", "modified_timestamp")
-        read_only_fields = ("id", "order", "shop", "bill",
-                            "due", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "shop",
+            "order",
+            "bill",
+            "paid",
+            "due",
+            "created_timestamp",
+            "modified_timestamp",
+        )
+        read_only_fields = (
+            "id",
+            "order",
+            "shop",
+            "bill",
+            "due",
+            "created_timestamp",
+            "modified_timestamp",
+        )
 
 
 class MoveProductSerializer(serializers.ModelSerializer):
@@ -513,12 +593,39 @@ class MoveProductSerializer(serializers.ModelSerializer):
         self.fields["warehouse"].queryset = models.Warehouse.objects.filter(
             shop=own_shop
         )
-        self.fields["product"].queryset = models.Product.objects.filter(
-            shop=own_shop)
+        self.fields["product"].queryset = models.Product.objects.filter(shop=own_shop)
 
     class Meta:
         model = models.MoveProduct
-        fields = ("id", "shop", "warehouse", "product", "quantity",
-                  "move", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "shop",
+            "warehouse",
+            "product",
+            "quantity",
+            "move",
+            "created_timestamp",
+            "modified_timestamp",
+        )
+        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
+
+
+class ExpenseSerializer(serializers.ModelSerializer):
+    """Serializer for expense"""
+
+    class Meta:
+        model = models.Expense
+        fields = (
+            "id",
+            "shop",
+            "subject",
+            "amount",
+            "created_timestamp",
+            "modified_timestamp",
+        )
         read_only_fields = (
-            "id", "shop", "created_timestamp", "modified_timestamp")
+            "id",
+            "shop",
+            "created_timestamp",
+            "modified_timestamp",
+        )

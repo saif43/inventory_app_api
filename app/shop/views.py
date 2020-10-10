@@ -18,6 +18,7 @@ from shop.permissions import (
     CustomerTrasnscationBillPermission,
     CustomerTrasnscationDueListPermission,
     MoveProductPermission,
+    ExpensePermission,
 )
 
 
@@ -275,3 +276,11 @@ class MoveProductViewSet(BaseShopAttr):
     queryset = models.MoveProduct.objects.all()
     serializer_class = serializers.MoveProductSerializer
     permission_classes = (MoveProductPermission,)
+
+
+class ExpenseViewSet(BaseShopAttr):
+    """Moving products shop to warehouse"""
+
+    queryset = models.Expense.objects.all()
+    serializer_class = serializers.ExpenseSerializer
+    permission_classes = (ExpensePermission,)

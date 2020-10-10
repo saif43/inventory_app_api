@@ -18,6 +18,8 @@ router.register("vendor_transactions_detail", views.VendorOrderedItemsViewSet)
 router.register("vendor_bill", views.VendorTrasnscationBillViewSet)
 router.register("vendor_bill_due", views.VendorDueListViewSet, basename="vendor_bill_due")
 router.register("move_product", views.MoveProductViewSet)
+router.register("expense", views.ExpenseViewSet)
+
 
 
 app_name = "shop"

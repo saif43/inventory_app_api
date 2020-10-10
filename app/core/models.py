@@ -305,3 +305,13 @@ class MoveProduct(models.Model):
     move = models.CharField(max_length=3, choices=options, null=True)
     created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
     modified_timestamp = models.DateTimeField(default=timezone.now)
+
+
+class Expense(models.Model):
+    """Model for expense"""
+
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=255, default="Empty")
+    amount = models.PositiveIntegerField(default=0)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)

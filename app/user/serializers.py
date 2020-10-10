@@ -21,10 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_manager",
             "is_salesman",
             "created_by",
-            "created_timestamp", 
-            "modified_timestamp"
         )
-
         extra_kwargs = {
             "password": {
                 "write_only": True,

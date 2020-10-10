@@ -205,3 +205,19 @@ class MoveProductPermission(permissions.BasePermission):
                 return True
         except:
             pass
+
+
+class ExpensePermission(permissions.BasePermission):
+    """Allowing/Restricting user to access the expense"""
+
+    message = "Mehtod allowed: GET | You must have a shop to access this."
+
+    def has_permission(self, request, obj):
+        try:
+            if getShop(request.user) and request.user.is_owner:
+                return True
+
+            if getShop(request.user) and request.method in ["GET", "POST"]:
+                return True
+        except:
+            pass
