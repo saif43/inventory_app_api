@@ -258,6 +258,17 @@ class VendorTrasnscationBillViewSet(BaseShopAttr):
     permission_classes = (CustomerTrasnscationBillPermission,)
 
 
+class VendorDueListViewSet(BaseShopAttr):
+    """Show Vendor transactions who has due"""
+
+    serializer_class = serializers.VendorTrasnscationBillSerializer
+    permission_classes = (CustomerTrasnscationDueListPermission,)
+
+    def get_queryset(self):
+        own_shop = getShop(self.request.user)
+        return models.VendorTrasnscationBill.objects.filter(shop=own_shop, due__gt=0)
+
+
 class MoveProductViewSet(BaseShopAttr):
     """Moving products shop to warehouse"""
 

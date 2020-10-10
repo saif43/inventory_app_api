@@ -1,7 +1,7 @@
 Filter in Bill----------------------Done
 Avg price in product
 Client due list---------------------Done
-Vendor due list
+Vendor due list---------------------Done
 product stock alert
 Sell by day
 Purchase by day

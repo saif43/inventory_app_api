@@ -164,8 +164,11 @@ class CustomerTrasnscationDueListPermission(permissions.BasePermission):
     message = "Mehtod allowed: GET | You must have a shop to access this."
 
     def has_permission(self, request, obj):
-        if getShop(request.user) and request.method in permissions.SAFE_METHODS:
-            return True
+        try:
+            if getShop(request.user) and request.method in permissions.SAFE_METHODS:
+                return True
+        except:
+            pass
 
 
 class CustomerOrderedItemsPermission(permissions.BasePermission):
