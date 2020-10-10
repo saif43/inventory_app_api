@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
 from django.db.models import signals
+from django.utils import timezone
+
 from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
@@ -44,6 +46,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_manager = models.BooleanField(default=False)
     is_salesman = models.BooleanField(default=False)
     created_by = models.ForeignKey("self", on_delete=None, null=True)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     objects = UserManager()
 
@@ -59,6 +63,8 @@ class Shop(models.Model):
     name = models.CharField(max_length=255)
     money = models.PositiveIntegerField(default=0)
     owner = models.ForeignKey(User, on_delete=None, null=True)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
@@ -73,6 +79,8 @@ class Product(models.Model):
     selling_price = models.PositiveIntegerField(default=0)
     stock = models.PositiveIntegerField(default=0)
     stock_alert_amount = models.PositiveIntegerField(default=0)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
@@ -83,6 +91,8 @@ class Warehouse(models.Model):
 
     name = models.CharField(max_length=255)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
@@ -95,6 +105,8 @@ class WareHouseProducts(models.Model):
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ("warehouse", "product")
@@ -106,6 +118,8 @@ class Customer(models.Model):
     name = models.CharField(max_length=255)
     contact = models.CharField(max_length=15, blank=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
@@ -117,6 +131,8 @@ class Vendor(models.Model):
     name = models.CharField(max_length=255)
     contact = models.CharField(max_length=15, blank=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
@@ -125,9 +141,10 @@ class Vendor(models.Model):
 class CustomerTrasnscation(models.Model):
     """Model for the transaction with Customer"""
 
-    order_time = models.DateTimeField(auto_now_add=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"Trans {self.pk}---{self.shop}"
@@ -145,6 +162,8 @@ class CustomerOrderedItems(models.Model):
     quantity = models.PositiveIntegerField(default=0)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
     bill = models.PositiveIntegerField(default=0)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ("order", "shop", "product")
@@ -161,6 +180,8 @@ class CustomerTrasnscationBill(models.Model):
     bill = models.PositiveIntegerField(default=0)
     paid = models.PositiveIntegerField(default=0)
     due = models.PositiveIntegerField(default=0)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
 
 @receiver(signals.post_save, sender=CustomerTrasnscation)
@@ -194,9 +215,10 @@ def update_customer_bill(sender, instance, created, **kwargs):
 class VendorTrasnscation(models.Model):
     """Model for the transaction with Vendor"""
 
-    order_time = models.DateTimeField(auto_now_add=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     vendor = models.ForeignKey(Vendor, on_delete=None)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"Trans {self.pk}---{self.shop}"
@@ -218,6 +240,8 @@ class VendorOrderedItems(models.Model):
     delivery_warehouse = models.ForeignKey(Warehouse, on_delete=None, null=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
     bill = models.PositiveIntegerField(default=0)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ("order", "shop", "product", "delivery_warehouse")
@@ -234,6 +258,8 @@ class VendorTrasnscationBill(models.Model):
     bill = models.PositiveIntegerField(default=0)
     paid = models.PositiveIntegerField(default=0)
     due = models.PositiveIntegerField(default=0)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
 
 
 @receiver(signals.post_save, sender=VendorTrasnscation)
@@ -277,3 +303,5 @@ class MoveProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     move = models.CharField(max_length=3, choices=options, null=True)
+    created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    modified_timestamp = models.DateTimeField(default=timezone.now)
