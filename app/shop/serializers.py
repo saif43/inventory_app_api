@@ -363,8 +363,19 @@ class VendorTrasnscationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.VendorTrasnscation
-        fields = ("id", "shop", "vendor", "created_timestamp", "modified_timestamp")
-        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
+        fields = ("id", "shop", "vendor", "image", "created_timestamp", "modified_timestamp")
+        read_only_fields = ("id", "shop", "image", "created_timestamp", "modified_timestamp")
+
+
+class VendorTrasnscationImageSerializer(serializers.ModelSerializer):
+    """Serializer for vendor product transaction"""
+
+    class Meta:
+        model = models.VendorTrasnscation
+        fields = ("id", "image",)
+        read_only_fields = ("id",)
+
+
 
 
 class VendorOrderedItemsSerializer(serializers.ModelSerializer):

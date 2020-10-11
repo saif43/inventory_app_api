@@ -1,3 +1,6 @@
+import uuid
+import os
+
 from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
@@ -9,6 +12,13 @@ from django.contrib.auth.models import (
     PermissionsMixin,
     BaseUserManager,
 )
+
+def transaction_image_file_path(instance, filename):
+    """Generate file path for new transaction image"""
+    ext = filename.split(".")[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+
+    return os.path.join('uploads/transaction/', filename)
 
 
 class UserManager(BaseUserManager):
@@ -217,6 +227,7 @@ class VendorTrasnscation(models.Model):
 
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     vendor = models.ForeignKey(Vendor, on_delete=None)
+    image = models.ImageField(null=True, upload_to=transaction_image_file_path)
     created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
     modified_timestamp = models.DateTimeField(default=timezone.now)
 
