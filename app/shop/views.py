@@ -1,13 +1,15 @@
 from core import models
 from shop import serializers
 
-from rest_framework import viewsets, status, filters, generics
+from rest_framework import viewsets, status, filters, generics, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 
 from rest_framework.authentication import TokenAuthentication
+from django.db.models import Avg, Sum
+
 from shop.permissions import (
     ShopAccessPermission,
     WarehouseAccessPermission,
@@ -64,9 +66,12 @@ class BaseShopAttr(viewsets.ModelViewSet):
         print(own_shop)
         serializer.save(shop=own_shop)
 
-    # def get_queryset(self):
-    #     own_shop = getShop(self.request.user)
-    #     return self.queryset.filter(shop=own_shop)
+    def get_queryset(self):
+        if not self.request.user.is_superuser:
+            own_shop = getShop(self.request.user)
+            return self.queryset.filter(pk=own_shop.id)
+
+        return self.queryset
 
 
 class WarehouseViewSet(BaseShopAttr):
@@ -306,3 +311,61 @@ class ExpenseViewSet(BaseShopAttr):
     queryset = models.Expense.objects.all()
     serializer_class = serializers.ExpenseSerializer
     permission_classes = (ExpensePermission,)
+
+
+class ReportViewSet(viewsets.ViewSet):
+    """Shows purchase report group by day"""
+
+    authentication_classes = (TokenAuthentication,)
+
+    def getModel(self):
+        pass
+
+    # Ref of Group by SUM
+    # https://stackoverflow.com/questions/18144907/how-to-rename-fields-of-an-annotated-query/38104242
+
+    def list(self, request, **kwargs):
+
+        user = models.User.objects.get(id=request.user.id)
+        own_shop = getShop(user)
+
+        if kwargs:
+            # if user want to get report of a specific date
+            date = kwargs["date"]
+
+            queryset = (
+                self.getModel()
+                .objects.filter(shop=own_shop)
+                .values("created_timestamp__date")
+                .annotate(bill=Sum("bill"))
+                .filter(created_timestamp__date=date)
+            )
+
+            queryset = [
+                {"date": x["created_timestamp__date"], "bill": x["bill"]}
+                for x in queryset
+            ]
+            return Response(queryset)
+
+        # if user want to see all report
+        queryset = (
+            self.getModel()
+            .objects.filter(shop=own_shop)
+            .values("created_timestamp__date")
+            .annotate(bill=Sum("bill"))
+        )
+
+        queryset = [
+            {"date": x["created_timestamp__date"], "bill": x["bill"]} for x in queryset
+        ]
+        return Response(queryset)
+
+
+class PurchaseReportViewSet(ReportViewSet):
+    def getModel(self):
+        return models.VendorOrderedItems
+
+
+class SellReportViewSet(ReportViewSet):
+    def getModel(self):
+        return models.CustomerOrderedItems
