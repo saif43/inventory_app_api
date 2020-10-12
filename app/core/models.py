@@ -227,7 +227,6 @@ class VendorTrasnscation(models.Model):
 
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     vendor = models.ForeignKey(Vendor, on_delete=None)
-    image = models.ImageField(null=True, upload_to=transaction_image_file_path)
     created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
     modified_timestamp = models.DateTimeField(default=timezone.now)
 
@@ -251,6 +250,7 @@ class VendorOrderedItems(models.Model):
     delivery_warehouse = models.ForeignKey(Warehouse, on_delete=None, null=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True)
     bill = models.PositiveIntegerField(default=0)
+    image = models.ImageField(null=True, upload_to=transaction_image_file_path)
     created_timestamp = models.DateTimeField(default=timezone.now, editable=False)
     modified_timestamp = models.DateTimeField(default=timezone.now)
 
