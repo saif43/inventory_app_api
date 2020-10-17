@@ -285,6 +285,15 @@ class VendorTrasnscationBillViewSet(BaseShopAttr):
     serializer_class = serializers.VendorTrasnscationBillSerializer
     permission_classes = (CustomerTrasnscationBillPermission,)
 
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("=order__id",)
+    """
+    '^' Starts-with search.
+    '=' Exact matches.
+    '@' Full-text search. (Currently only supported Django's PostgreSQL backend.)
+    '$' Regex search.
+    """
+
 
 class VendorDueListViewSet(BaseShopAttr):
     """Show Vendor transactions who has due"""
