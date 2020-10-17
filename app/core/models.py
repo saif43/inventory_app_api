@@ -13,12 +13,13 @@ from django.contrib.auth.models import (
     BaseUserManager,
 )
 
+
 def transaction_image_file_path(instance, filename):
     """Generate file path for new transaction image"""
     ext = filename.split(".")[-1]
-    filename = f'{uuid.uuid4()}.{ext}'
+    filename = f"{uuid.uuid4()}.{ext}"
 
-    return os.path.join('uploads/transaction/', filename)
+    return os.path.join("uploads/transaction/", filename)
 
 
 class UserManager(BaseUserManager):
@@ -86,6 +87,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     buying_price = models.PositiveIntegerField(default=0)
+    avg_buying_price = models.PositiveIntegerField(default=0)
     selling_price = models.PositiveIntegerField(default=0)
     stock = models.PositiveIntegerField(default=0)
     stock_alert_amount = models.PositiveIntegerField(default=0)

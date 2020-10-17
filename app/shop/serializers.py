@@ -117,6 +117,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "buying_price",
+            "avg_buying_price",
             "selling_price",
             "stock",
             "stock_alert_amount",
@@ -124,7 +125,13 @@ class ProductSerializer(serializers.ModelSerializer):
             "created_timestamp",
             "modified_timestamp",
         )
-        read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
+        read_only_fields = (
+            "id",
+            "shop",
+            "avg_buying_price",
+            "created_timestamp",
+            "modified_timestamp",
+        )
 
 
 class CustomerSerializer(serializers.ModelSerializer):
