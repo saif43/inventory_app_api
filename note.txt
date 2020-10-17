@@ -1,33 +1,11 @@
-Filter in Bill----------------------Done
-Avg price in product
-Client due list---------------------Done
-Vendor due list---------------------Done
-product stock alert-----------------Done
-Sell by day-------------------------Done
-Purchase by day---------------------Done
-Expense-----------------------------Done
-Vendor order transaction image------Done
-
-
-
-Product Initialize
--------------------------
-
-buying_price = 100
-selling_price = 200
-
-If buying_price changes vastly, for example buying_price is now 500,
-----------------------------------------------
-|   user will change buying_price manually   |
-|   user will change selling_price manually  |
-----------------------------------------------
-
-If buying_price changes slightly, for example buying_price is now 110
---------------------------------------------------------------
-|   buying_price = avg(old_buying_price, new_buying_price)   |
-|   user will change selling_price manually                  |
---------------------------------------------------------------
-
-
-
-
+Filter in Bill------------------------------Done
+Client due list-----------------------------Done
+Vendor due list-----------------------------Done
+product stock alert-------------------------Done
+Sell by day---------------------------------Done
+Purchase by day-----------------------------Done
+Shop Expense--------------------------------Done
+Vendor order transaction image--------------Done
+Avg price in product------------------------Done
+Custom buying price from Vendor-------------Done
+Custom selling price to Customer------------Done

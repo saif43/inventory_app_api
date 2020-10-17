@@ -179,7 +179,13 @@ class CustomerTrasnscationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.CustomerTrasnscation
-        fields = ("id", "shop", "customer", "created_timestamp", "modified_timestamp")
+        fields = (
+            "id",
+            "shop",
+            "customer",
+            "created_timestamp",
+            "modified_timestamp",
+        )
         read_only_fields = ("id", "shop", "created_timestamp", "modified_timestamp")
 
 
@@ -189,7 +195,7 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
     def validate(self, data):
         product = data["product"]
         data["product_detail"] = data["product"]
-        data["selling_price"] = product.selling_price
+        # data["selling_price"] = product.selling_price
         quantity = data["quantity"]
         order = data["order"]
 
@@ -202,7 +208,7 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
             product=product, order=order
         )
 
-        data["bill"] = product.selling_price * quantity
+        data["bill"] = data["custom_selling_price"] * quantity
 
         if exists:
             raise serializers.ValidationError("Duplicate entires not allowed.")
@@ -236,7 +242,7 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
             "shop",
             "product",
             "product_detail",
-            "selling_price",
+            "custom_selling_price",
             "quantity",
             "bill",
             "created_timestamp",
@@ -247,7 +253,6 @@ class CustomerOrderedItemsSerializer(serializers.ModelSerializer):
             "shop",
             "bill",
             "product_detail",
-            "selling_price",
             "created_timestamp",
             "modified_timestamp",
         )
@@ -392,7 +397,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
     def validate(self, data):
         product = data["product"]
         data["product_detail"] = data["product"]
-        data["buying_price"] = product.buying_price
+        # data["buying_price"] = product.buying_price
         quantity = data["quantity"]
         order = data["order"]
         warehouse = data["delivery_warehouse"]
@@ -404,9 +409,17 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
         if warehouse is None:
             raise serializers.ValidationError("No warehouse has been selected.")
 
-        data["bill"] = product.buying_price * quantity
+        data["bill"] = data["custom_buying_price"] * quantity
 
         stock = product.stock + quantity
+
+        """Changing Product avg_buying_price"""
+        if product.avg_buying_price == 0:
+            product.avg_buying_price = data["custom_buying_price"]
+        else:
+            product.avg_buying_price = (
+                data["custom_buying_price"] + product.avg_buying_price
+            ) / 2
 
         product.stock = stock
         product.save()
@@ -435,6 +448,7 @@ class VendorOrderedItemsSerializer(serializers.ModelSerializer):
             "shop",
             "product",
             "buying_price",
+            "custom_buying_price",
             "product_detail",
             "delivery_warehouse",
             "quantity",

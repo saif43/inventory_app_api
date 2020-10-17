@@ -168,6 +168,7 @@ class CustomerOrderedItems(models.Model):
     order = models.ForeignKey(CustomerTrasnscation, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     selling_price = models.PositiveIntegerField(default=0)
+    custom_selling_price = models.PositiveIntegerField(default=0)
     product_detail = models.ForeignKey(
         Product, on_delete=models.CASCADE, null=True, related_name="product_detail"
     )
@@ -242,6 +243,7 @@ class VendorOrderedItems(models.Model):
     order = models.ForeignKey(VendorTrasnscation, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     buying_price = models.PositiveIntegerField(default=0)
+    custom_buying_price = models.PositiveIntegerField(default=0)
     product_detail = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,

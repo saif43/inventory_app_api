@@ -69,7 +69,7 @@ class BaseShopAttr(viewsets.ModelViewSet):
     def get_queryset(self):
         if not self.request.user.is_superuser:
             own_shop = getShop(self.request.user)
-            return self.queryset.filter(pk=own_shop.id)
+            return self.queryset.filter(shop=own_shop)
 
         return self.queryset
 
