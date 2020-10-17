@@ -1,11 +1,11 @@
-Filter in Bill------------------------------Done
-Client due list-----------------------------Done
-Vendor due list-----------------------------Done
-product stock alert-------------------------Done
-Sell by day---------------------------------Done
-Purchase by day-----------------------------Done
-Shop Expense--------------------------------Done
-Vendor order transaction image--------------Done
-Avg price in product------------------------Done
-Custom buying price from Vendor-------------Done
-Custom selling price to Customer------------Done
+Filter in Bill------------------------------Done------------Documentation Done
+Client due list-----------------------------Done------------Documentation Done
+Vendor due list-----------------------------Done------------Documentation Done
+product stock alert-------------------------Done------------Documentation Done
+Sell by day---------------------------------Done------------Documentation Done
+Purchase by day-----------------------------Done------------Documentation Done
+Shop Expense--------------------------------Done------------Documentation Done
+Vendor order transaction image--------------Done------------Documentation Done
+Avg price in product------------------------Done------------Documentation Done
+Custom buying price from Vendor-------------Done------------Documentation Done
+Custom selling price to Customer------------Done------------Documentation Done

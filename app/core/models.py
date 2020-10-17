@@ -221,6 +221,9 @@ def update_customer_bill(sender, instance, created, **kwargs):
         for i in order_object:
             bill += i.bill
 
+        if bill_object.due == 0:
+            bill_object.due = bill
+
         bill_object.bill = bill
         bill_object.save()
 
@@ -300,6 +303,9 @@ def update_vendor_bill(sender, instance, created, **kwargs):
 
         for i in order_object:
             bill += i.bill
+
+        if bill_object.due == 0:
+            bill_object.due = bill
 
         bill_object.bill = bill
         bill_object.save()
